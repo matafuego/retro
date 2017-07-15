@@ -14,9 +14,13 @@
     "morgan": "~1.8.1",
     "mysql2": "^1.3.5",
     "nodemon": "^1.11.0",
-    "sequelize": "^4.1.0"
+    "sequelize": "^4.1.0",
+    "swagger-tools": "^0.10.1",
+    "swagger-ui": "^3.0.19",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "prettier": "^1.5.3",
     "sequelize": "^4.1.0"
   }
 }

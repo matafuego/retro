@@ -1,0 +1,267 @@
+swagger: "2.0"
+
+info:
+  version: "1.0.0"
+  title: "Retro99"
+  description: "“Silence is a source of great strength.” ~Lao Tzu"
+    
+basePath: "/api"
+
+tags:
+- name: "project"
+  description: "Everything about projects"
+- name: "team"
+  description: "Teams inside projects"
+
+paths:
+  /projects:
+    post:
+      tags:
+      - "project"
+      summary: "Add new project"
+      description: ""
+      operationId: "addProject"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Project to be created"
+        required: true
+        schema:
+          $ref: "#/definitions/ProjectBody"
+      responses:
+        200:
+          description: "Project created"
+          schema:
+            $ref: '#/definitions/Project'
+    get:
+      tags:
+      - "project"
+      summary: "Lists all projects"
+      description: ""
+      operationId: "listProjects"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "List of projects"
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/Project'
+
+  /projects/{projectId}:
+  
+    put:
+      tags:
+      - "project"
+      summary: "Update an existing project"
+      description: ""
+      operationId: "updateProject"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        description: The id of the project to update
+        type: string
+      - in: "body"
+        name: "body"
+        description: "Project to be updated"
+        required: true
+        schema:
+          $ref: "#/definitions/ProjectBody"
+      responses:
+        404:
+          description: "Project not found"
+        200:
+          description: "Project updated"
+          schema:
+            $ref: '#/definitions/Project'
+    get:
+      tags:
+      - "project"
+      summary: "Retrieve an existing project"
+      description: ""
+      operationId: "retrieveProject"
+      produces:
+      - "application/json"
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        description: The id of the project to retrieve
+        type: string
+      responses:
+        404:
+          description: "Project not found"
+        200:
+          description: "Retrieved project"
+          schema:
+            $ref: '#/definitions/Project'
+    delete:
+      tags:
+      - "project"
+      summary: "Delete an existing project"
+      description: ""
+      operationId: "deleteProject"
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        description: The id of the project to delete
+        type: string
+      responses:
+        404:
+          description: "Project not found"
+        204:
+          description: "Project deleted"
+          
+  /projects/{projectId}/teams:
+  
+    post:
+      tags:
+      - "team"
+      summary: "Add a team to a project"
+      description: ""
+      operationId: "createTeam"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        description: The id of the project where the team is
+        type: string
+      - in: "body"
+        name: "body"
+        description: "Team to be inserted"
+        required: true
+        schema:
+          $ref: "#/definitions/TeamBody"
+      responses:
+        200:
+          description: "Team created"
+          schema:
+            $ref: '#/definitions/Team'
+
+  /projects/{projectId}/teams/{teamId}:
+  
+    put:
+      tags:
+      - "team"
+      summary: "Update an existing team"
+      description: ""
+      operationId: "updateTeam"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        description: The id of the project where the team is
+        type: string
+      - name: teamId
+        in: path
+        required: true
+        description: The id of the team to update
+        type: string
+      - in: "body"
+        name: "body"
+        description: "Team to be updated"
+        required: true
+        schema:
+          $ref: "#/definitions/TeamBody"
+      responses:
+        404:
+          description: "Team not found"
+        200:
+          description: "Team updated"
+          schema:
+            $ref: '#/definitions/Team'
+    delete:
+      tags:
+      - "team"
+      summary: "Delete an existing team"
+      description: ""
+      operationId: "deleteTeam"
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        description: The id of the project where the team is
+        type: string
+      - name: teamId
+        in: path
+        required: true
+        description: The id of the team to delete
+        type: string
+      responses:
+        404:
+          description: "Team not found"
+        204:
+          description: "Team deleted"
+
+definitions:
+  ProjectBody:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      name:
+        type: "string"
+        example: "My Project"
+  Project:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+        example: "My Project"
+      createdAt:
+        type: "string"
+        format: "date-time"
+      updatedAt:
+        type: "string"
+        format: "date-time"
+      teams:
+        type: "array"
+        items:
+          $ref: '#/definitions/Team'
+  TeamBody:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      name:
+        type: "string"
+        example: "The B Team"
+  Team:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+        example: "The A Team"
+      createdAt:
+        type: "string"
+        format: "date-time"
+      updatedAt:
+        type: "string"
+        format: "date-time"
