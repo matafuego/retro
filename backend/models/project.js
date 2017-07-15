@@ -6,15 +6,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-  }, {
-      classMethods: {
-        associate: (models) => {
-          Project.hasMany(models.Team, {
-            foreignKey: 'projectId',
-            as: 'teams',
-          });
-        }
-      }
+  });
+
+  Project.associate = (models) => {
+    Project.hasMany(models.Team, {
+      foreignKey: 'projectId',
+      as: 'teams',
     });
+  };
+
   return Project;
 };

@@ -6,15 +6,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-  }, {
-    classMethods: {
-      associate: (models) => {
-        Team.belongsTo(models.Project, {
-          foreignKey: 'projectId',
-          onDelete: 'CASCADE',
-        });
-      }
-    }
   });
+
+  Team.associate = (models) => {
+    Team.belongsTo(models.Project, {
+      foreignKey: 'projectId',
+      onDelete: 'CASCADE',
+    });
+  };
+
   return Team;
 };
