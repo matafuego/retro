@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'projectId',
       as: 'teams',
     });
+    Project.belongsToMany(models.User, {
+      as: 'members',
+      through: 'Staffing',
+      foreignKey: 'userId',
+      onDelete: 'CASCADE',
+    });
   };
 
   return Project;

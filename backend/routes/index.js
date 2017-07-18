@@ -1,5 +1,6 @@
 const projectsController = require('../controllers').projects;
 const teamsController = require('../controllers').teams;
+const usersController = require('../controllers').users;
 
 module.exports = (app) => {
   app.get('/api', (req, res) => res.status(200).send({
@@ -18,6 +19,18 @@ module.exports = (app) => {
 
   // For any other request method on teams, we're going to return "Method not allowed"
   app.all('/api/projects/:projectId/teams', (req, res) =>
+    res.status(405).send({
+      message: 'Method not allowed',
+    }));
+
+  app.post('/api/users', usersController.create);
+  app.get('/api/users', usersController.list);
+  app.get('/api/users/:userId', usersController.retrieve);
+  app.get('/api/users/username/:username', usersController.retrieveByUsername);
+  app.delete('/api/users/:userId', usersController.delete);
+
+  // For any other request method on teams, we're going to return "Method not allowed"
+  app.all('/api/users', (req, res) =>
     res.status(405).send({
       message: 'Method not allowed',
     }));
