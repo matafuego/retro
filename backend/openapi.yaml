@@ -12,6 +12,8 @@ tags:
   description: "Everything about projects"
 - name: "team"
   description: "Teams inside projects"
+- name: "user"
+  description: "Users that are team members"
 
 paths:
   /projects:
@@ -212,6 +214,114 @@ paths:
         204:
           description: "Team deleted"
 
+  /users:
+    post:
+      tags:
+      - "user"
+      summary: "Add new user"
+      description: ""
+      operationId: "addUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User to be created"
+        required: true
+        schema:
+          $ref: "#/definitions/UserBody"
+      responses:
+        200:
+          description: "User created"
+          schema:
+            $ref: '#/definitions/User'
+        409:
+          description: "User already exists"
+        
+    get:
+      tags:
+      - "user"
+      summary: "Lists all users"
+      description: ""
+      operationId: "listUsers"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "List of users"
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/User'
+
+  /users/{userId}:
+  
+    get:
+      tags:
+      - "user"
+      summary: "Retrieve an existing user"
+      description: ""
+      operationId: "retrieveUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        description: The id of the user to retrieve
+        type: string
+      responses:
+        404:
+          description: "User not found"
+        200:
+          description: "Retrieved user"
+          schema:
+            $ref: '#/definitions/User'
+    delete:
+      tags:
+      - "user"
+      summary: "Delete an existing user"
+      description: ""
+      operationId: "deleteUser"
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        description: The id of the user to delete
+        type: string
+      responses:
+        404:
+          description: "User not found"
+        204:
+          description: "User deleted"
+
+  /users/username/{username}:
+  
+    get:
+      tags:
+      - "user"
+      summary: "Retrieve an existing user by username"
+      description: ""
+      operationId: "retrieveUserByUsername"
+      produces:
+      - "application/json"
+      parameters:
+      - name: username
+        in: path
+        required: true
+        description: The username of the user to retrieve
+        type: string
+      responses:
+        404:
+          description: "User not found"
+        200:
+          description: "Retrieved user"
+          schema:
+            $ref: '#/definitions/User'
+
+
 definitions:
   ProjectBody:
     type: "object"
@@ -241,6 +351,34 @@ definitions:
         type: "array"
         items:
           $ref: '#/definitions/Team'
+  UserBody:
+    type: "object"
+    required:
+    - "username"
+    properties:
+      username:
+        type: "string"
+        example: "matafuego"
+  User:
+    type: "object"
+    required:
+    - "username"
+    properties:
+      id:
+        type: "integer"
+      username:
+        type: "string"
+        example: "matafuego"
+      createdAt:
+        type: "string"
+        format: "date-time"
+      updatedAt:
+        type: "string"
+        format: "date-time"
+      projects:
+        type: "array"
+        items:
+          $ref: '#/definitions/ProjectBody'
   TeamBody:
     type: "object"
     required:
