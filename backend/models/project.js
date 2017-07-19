@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     Project.belongsToMany(models.User, {
       as: 'members',
       through: 'Staffing',
-      foreignKey: 'userId',
+      foreignKey: 'projectId',
       onDelete: 'CASCADE',
     });
   };

@@ -28,6 +28,7 @@ module.exports = (app) => {
   app.get('/api/users/:userId', usersController.retrieve);
   app.get('/api/users/username/:username', usersController.retrieveByUsername);
   app.delete('/api/users/:userId', usersController.delete);
+  app.put('/api/users/:userId/projects/', usersController.asignToProject);
 
   // For any other request method on teams, we're going to return "Method not allowed"
   app.all('/api/users', (req, res) =>

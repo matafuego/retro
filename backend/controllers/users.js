@@ -1,6 +1,8 @@
 const User = require('../models').User;
 const Project = require('../models').Project;
 const Team = require('../models').Team;
+const Errors = require('../errors/errors');
+const sequelize = require('../models').sequelize;
 
 module.exports = {
   create(req, res, next) {
@@ -92,4 +94,51 @@ module.exports = {
       .catch(error => next(error));
   },
 
+  asignToProject(req, res, next) {
+    return sequelize.transaction().then(function (t) {
+      return User.findById(req.params.userId, { transaction: t })
+        .then(user => {
+          if (!user) {
+            throw Errors.notFound('userNotFound', 'User not found');
+          }
+
+          var promises = [];
+          var projects = req.body;
+          projects.forEach((project) =>
+            promises.push(assignUserToProject(user, project.projectId, t))
+          );
+
+          return sequelize.Promise.all(promises);
+        })
+        .then(result => {
+          return User.findById(req.params.userId, {
+            include: [{
+              model: Project,
+              as: 'projects',
+            }],
+            transaction: t,
+          })
+        })
+        .then(user => {
+          if (!user) {
+            throw Errors.notFound('userNotFound', 'User not found');
+          }
+          return res.status(200).send(user);
+        })
+        .then(result => { return t.commit(); })
+        .catch(error => { t.rollback(); next(error); });
+    })
+      .catch(error => next(error))
+  },
 };
+
+function assignUserToProject(user, projectId, t) {
+  return Project
+    .findById(projectId, { transaction: t })
+    .then(project => {
+      if (!project) {
+        throw Errors.badRequest('projectNotFound', 'Project ' + projectId + ' does not exist');
+      }
+      return user.addProject(project, { transaction: t });
+    });
+}
