@@ -3,11 +3,13 @@ node_js:
   - "6"
 services:
   - mysql
+env:
+  - NODE_ENV=travis
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS retro98_test;'
-  - export NODE_ENV=travis
   - cd backend
 install:
   - yarn install
 script:
   - yarn test
+after_script: NODE_ENV=travis istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
