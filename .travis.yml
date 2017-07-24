@@ -1,4 +1,3 @@
-before_script: cd backend
 language: node_js
 node_js:
   - "6"
@@ -7,6 +6,7 @@ services:
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS retro98_test;'
   - export NODE_ENV=travis
+  - cd backend
 install:
   - yarn install
 script:
