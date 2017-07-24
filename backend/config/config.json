@@ -1,6 +1,6 @@
 {
   "development": {
-    "username": "retro992",
+    "username": "retro99",
     "password": "dQ8QxZfsbZVZLb6n",
     "database": "retro98",
     "host": "127.0.0.1",
@@ -14,7 +14,7 @@
     "dialect": "mysql"
   },
   "travis": {
-    "username": "travis",
+    "username": "root",
     "password": null,
     "database": "retro98_test",
     "host": "127.0.0.1",
