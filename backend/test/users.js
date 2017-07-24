@@ -76,6 +76,24 @@ describe('User', () => {
         })
     })
 
+    describe('GET request on /api/users/username/:username', () => {
+        it('should be a user object', () => {
+            return chai.request(app).get('/api/users/username/oneUser')
+                .then(res => {
+                    const user = res.body
+                    expect(user).to.be.an('object')
+                    expect(user.username).to.eql('oneUser')
+                })
+        })
+        it('should return a 404 code', () => {
+            return chai.request(app).get('/api/users/username/twoUser')
+                .catch(err => {
+                    expect(err.status).to.eql(404)
+                    expect(err.message).to.eql('Not Found')
+                })
+        })
+    })
+
     describe('POST request on /api/users', () => {
         it('should create a new user', () => {
             const obj = {
@@ -106,5 +124,24 @@ describe('User', () => {
 
     })
 
+    describe('DELETE request on /api/users/:id', () => {
+        it('should send a 204 status', () => {
+            return chai.request(app)
+                .delete('/api/users/1')
+                .then(res => {
+                    expect(res.status).to.be.eql(204)
+                    return User.findById(1).then(user => {
+                        expect(user).to.be.null
+                    })
+                })
+        })
+        it('should return a 404 code', () => {
+            return chai.request(app).delete('/api/users/2')
+                .catch(err => {
+                    expect(err.status).to.eql(404)
+                    expect(err.message).to.eql('Not Found')
+                })
+        })
+    })
 
 })
