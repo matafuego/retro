@@ -1,0 +1,5 @@
+language: node_js
+services:
+  - mysql
+before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS retro98_test;'
