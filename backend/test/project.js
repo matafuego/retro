@@ -25,7 +25,7 @@ describe('Project', () => {
         });
     })
 
-    describe('GET request on /projects', () => {
+    describe('GET request on /api/projects', () => {
         it('should be json', () => {
             return chai.request(app).get('/api/projects')
                 .then(res => {
@@ -40,7 +40,7 @@ describe('Project', () => {
         })
     })
 
-    describe('GET request on /projects/:id', () => {
+    describe('GET request on /api/projects/:id', () => {
         it('should be a project object', () => {
             return chai.request(app).get('/api/projects/1')
                 .then(res => {
@@ -58,7 +58,7 @@ describe('Project', () => {
         })
     })
 
-    describe('POST request on /projects', () => {
+    describe('POST request on /api/projects', () => {
         it('should create a new project', () => {
             const obj = {
                 name: 'mySecondProject'
@@ -76,7 +76,7 @@ describe('Project', () => {
         })
     })
 
-    describe('PUT request on /projects/:id', () => {
+    describe('PUT request on /api/projects/:id', () => {
         const obj = {
             name: 'myFirstProjectUpdated'
         }
@@ -99,8 +99,8 @@ describe('Project', () => {
         })
     })
 
-    describe('DELETE request on /projects/:id', () => {
-        it('should send a 200 status', () => {
+    describe('DELETE request on /api/projects/:id', () => {
+        it('should send a 204 status', () => {
             return chai.request(app)
                 .delete('/api/projects/1')
                 .then(res => {
