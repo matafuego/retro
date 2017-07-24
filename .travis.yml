@@ -4,3 +4,7 @@ services:
   - mysql
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS retro98_test;'
+install:
+  - yarn install
+script:
+  - yarn test
