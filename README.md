@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/matafuego/retro.png)](https://travis-ci.org/matafuego/retro)
+[![Coverage Status](https://coveralls.io/repos/github/matafuego/retro/badge.svg)](https://coveralls.io/github/matafuego/retro)
 
 # Retro99
 
