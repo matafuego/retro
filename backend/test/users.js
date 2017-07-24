@@ -16,7 +16,7 @@ require('./globalBefore')
 describe('User', () => {
 
     beforeEach(() => {
-        return db.sequelize.query('TRUNCATE table staffing').
+        return db.sequelize.query('TRUNCATE table Staffing').
             then(result => {
                 return mysqlhelper.truncate(User, db.sequelize)
             }).then(result => {
