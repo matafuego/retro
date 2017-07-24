@@ -49,6 +49,7 @@ describe('Team', () => {
                     expect(project).to.be.an('object')
                     expect(project.name).to.eql('myFirstProject')
                     expect(project.teams).to.be.an('array')
+                    expect(project.teams.length).to.eql(1)
                 })
         })
     })
