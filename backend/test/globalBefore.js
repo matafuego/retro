@@ -1,5 +1,3 @@
-process.env.NODE_ENV = 'test'
-
 var db = require('../models');
 
 before(function (done) {
