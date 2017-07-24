@@ -9,8 +9,8 @@ env:
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS retro98_test;'
   - cd backend
-  - npm install sequelize-cli
-  - ./node_modules/sequelize-cli/bin/sequelize db:migrate
+  - npm install -g sequelize sequelize-cli
+  - sequelize db:migrate
 install:
   - npm install
 script:
