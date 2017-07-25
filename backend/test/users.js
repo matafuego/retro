@@ -40,6 +40,8 @@ describe("User", () => {
             .then(result => {
                 const userOne = {
                     username: "oneUser",
+                    email: "one@mail.com",
+                    name: "One User Name",
                     id: 1
                 };
                 return User.create(userOne);
@@ -65,6 +67,8 @@ describe("User", () => {
                 const user = res.body;
                 expect(user).to.be.an("object");
                 expect(user.username).to.eql("oneUser");
+                expect(user.name).to.eql("One User Name");
+                expect(user.email).to.eql("one@mail.com");
             });
         });
         it("should return a 404 code", () => {
@@ -84,6 +88,8 @@ describe("User", () => {
                     const user = res.body;
                     expect(user).to.be.an("object");
                     expect(user.username).to.eql("oneUser");
+                    expect(user.name).to.eql("One User Name");
+                    expect(user.email).to.eql("one@mail.com");
                 });
         });
         it("should return a 404 code", () => {
@@ -100,12 +106,16 @@ describe("User", () => {
     describe("POST request on /api/users", () => {
         it("should create a new user", () => {
             const obj = {
-                username: "twoUser"
+                username: "twoUser",
+                email: "two@mail.com",
+                name: "Two User Name"
             };
             return chai.request(app).post("/api/users").send(obj).then(res => {
                 const user = res.body;
                 expect(user).to.be.an("object");
                 expect(user.username).to.eql("twoUser");
+                expect(user.name).to.eql("Two User Name");
+                expect(user.email).to.eql("two@mail.com");
                 return User.findById(user.id).then(retrieved => {
                     expect(retrieved.username).to.be.eql(user.username);
                 });
@@ -114,6 +124,16 @@ describe("User", () => {
         it("should fail if user is not unique", () => {
             const obj = {
                 username: "oneUser"
+            };
+            return chai.request(app).post("/api/users").send(obj).catch(err => {
+                expect(err.status).to.eql(409);
+                expect(err.message).to.eql("Conflict");
+            });
+        });
+        it("should fail if email is not unique", () => {
+            const obj = {
+                username: "fiveUser",
+                email: "one@mail.com"
             };
             return chai.request(app).post("/api/users").send(obj).catch(err => {
                 expect(err.status).to.eql(409);

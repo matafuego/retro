@@ -12,7 +12,9 @@ module.exports = {
             .then(user => {
                 if (!user) {
                     return User.create({
-                        username: req.body.username
+                        username: req.body.username,
+                        name: req.body.name,
+                        email: req.body.email
                     })
                         .then(user => res.status(201).send(user))
                         .catch(error => next(error));

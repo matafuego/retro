@@ -1,32 +1,36 @@
 {
-  "name": "backend",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "start": "nodemon ./bin/www",
-    "test": "mocha --timeout 10000"
-  },
-  "dependencies": {
-    "api-error-handler": "^1.0.0",
-    "body-parser": "~1.17.1",
-    "cookie-parser": "~1.4.3",
-    "debug": "~2.6.3",
-    "express": "^4.15.3",
-    "morgan": "~1.8.1",
-    "mysql2": "^1.3.5",
-    "nodemon": "^1.11.0",
-    "sequelize": "^4.1.0",
-    "swagger-tools": "^0.10.1",
-    "swagger-ui": "^3.0.19",
-    "yamljs": "^0.3.0"
-  },
-  "devDependencies": {
-    "chai": "^4.1.0",
-    "chai-http": "^3.0.0",
-    "coveralls": "^2.13.1",
-    "istanbul": "^0.4.5",
-    "jsonify": "^0.0.0",
-    "mocha": "^3.4.2",
-    "prettier": "^1.5.3"
-  }
+    "name": "backend",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "start": "nodemon ./bin/www",
+        "test": "mocha --timeout 10000",
+        "migrations": "sequelize db:migrate",
+        "revertMigration": "sequelize db:migrate:undo",
+        "testMigrations": "cross-env NODE_ENV=test sequelize db:migrate"
+    },
+    "dependencies": {
+        "api-error-handler": "^1.0.0",
+        "body-parser": "~1.17.1",
+        "cookie-parser": "~1.4.3",
+        "debug": "~2.6.3",
+        "express": "^4.15.3",
+        "morgan": "~1.8.1",
+        "mysql2": "^1.3.5",
+        "nodemon": "^1.11.0",
+        "sequelize": "^4.1.0",
+        "swagger-tools": "^0.10.1",
+        "swagger-ui": "^3.0.19",
+        "yamljs": "^0.3.0"
+    },
+    "devDependencies": {
+        "chai": "^4.1.0",
+        "chai-http": "^3.0.0",
+        "coveralls": "^2.13.1",
+        "cross-env": "^5.0.1",
+        "istanbul": "^0.4.5",
+        "jsonify": "^0.0.0",
+        "mocha": "^3.4.2",
+        "prettier": "^1.5.3"
+    }
 }
