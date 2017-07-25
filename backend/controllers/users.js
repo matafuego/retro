@@ -19,9 +19,7 @@ module.exports = {
             .then(user => res.status(201).send(user))
             .catch(error => next(error));
         }
-        return res.status(409).send({
-          message: 'User already exists',
-        });
+        throw Errors.conflict('userExists', 'User already exists');
       })
       .catch(error => next(error));
   },
@@ -49,9 +47,7 @@ module.exports = {
       })
       .then(user => {
         if (!user) {
-          return res.status(404).send({
-            message: 'User not found',
-          });
+          throw Errors.notFound('userNotFound', 'User not found');
         }
         return res.status(200).send(user);
       })
@@ -68,9 +64,7 @@ module.exports = {
       })
       .then(user => {
         if (!user) {
-          return res.status(404).send({
-            message: 'User not found',
-          });
+          throw Errors.notFound('userNotFound', 'User not found');
         }
         return res.status(200).send(user);
       })
@@ -82,9 +76,7 @@ module.exports = {
       .findById(req.params.userId)
       .then(user => {
         if (!user) {
-          return res.status(404).send({
-            message: 'User not found',
-          });
+          throw Errors.notFound('userNotFound', 'User not found');
         }
         return user
           .destroy()

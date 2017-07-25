@@ -16,4 +16,11 @@ module.exports = {
         return notFound;
     },
 
+    conflict(name, message) {
+        var conflict = new Error(message);
+        conflict.name = name;
+        conflict.statusCode = 409;
+        return conflict;
+    },
+
 }

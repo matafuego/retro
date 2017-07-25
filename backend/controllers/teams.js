@@ -1,4 +1,5 @@
 const Team = require('../models').Team;
+const Errors = require('../errors/errors');
 
 module.exports = {
   create(req, res, next) {
@@ -21,9 +22,7 @@ module.exports = {
       })
       .then(team => {
         if (!team) {
-          return res.status(404).send({
-            message: 'Team not found',
-          });
+          throw Errors.notFound('teamNotFound', 'Team not found');
         }
 
         return team
@@ -44,9 +43,7 @@ module.exports = {
       })
       .then(team => {
         if (!team) {
-          return res.status(404).send({
-            message: 'Team not found',
-          });
+          throw Errors.notFound('teamNotFound', 'Team not found');
         }
 
         return team

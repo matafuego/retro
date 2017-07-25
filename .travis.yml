@@ -14,3 +14,5 @@ install:
 script:
   - npm test
 after_script: NODE_ENV=travis istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
+notifications:
+  email: false

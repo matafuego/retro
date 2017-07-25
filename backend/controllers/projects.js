@@ -1,6 +1,6 @@
 const Project = require('../models').Project;
 const Team = require('../models').Team;
-
+const Errors = require('../errors/errors');
 
 module.exports = {
   create(req, res, next) {
@@ -34,9 +34,7 @@ module.exports = {
       })
       .then(project => {
         if (!project) {
-          return res.status(404).send({
-            message: 'Project not found',
-          });
+          throw Errors.notFound('projectNotFound', 'Project not found');
         }
         return res.status(200).send(project);
       })
@@ -53,9 +51,7 @@ module.exports = {
       })
       .then(project => {
         if (!project) {
-          return res.status(404).send({
-            message: 'Project not found',
-          });
+          throw Errors.notFound('projectNotFound', 'Project not found');
         }
         return project
           .update({
@@ -72,9 +68,7 @@ module.exports = {
       .findById(req.params.projectId)
       .then(project => {
         if (!project) {
-          return res.status(404).send({
-            message: 'Project not found',
-          });
+          throw Errors.notFound('projectNotFound', 'Project not found');
         }
         return project
           .destroy()
