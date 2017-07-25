@@ -1,132 +1,148 @@
-const chaiHttp = require('chai-http')
-const chai = require('chai')
+const chaiHttp = require("chai-http");
+const chai = require("chai");
 
-const app = require('../app')
-const db = require('../models')
-const mysqlhelper = require('./mysqlhelper')
+const app = require("../app");
+const db = require("../models");
+const mysqlhelper = require("./mysqlhelper");
 
-const Project = db.Project
-const Team = db.Team
+const Project = db.Project;
+const Team = db.Team;
 
-chai.use(chaiHttp)
-const expect = chai.expect
+chai.use(chaiHttp);
+const expect = chai.expect;
 
-require('./globalBefore')
+require("./globalBefore");
 
-describe('Team', () => {
-
+describe("Team", () => {
     beforeEach(() => {
-        return mysqlhelper.truncate(Team, db.sequelize)
+        return mysqlhelper
+            .truncate(Team, db.sequelize)
             .then(result => {
-                return mysqlhelper.truncate(Project, db.sequelize)
-            }).then(result => {
+                return mysqlhelper.truncate(Project, db.sequelize);
+            })
+            .then(result => {
                 const projectOne = {
-                    name: 'myFirstProject',
+                    name: "myFirstProject",
                     id: 1
-                }
-                return Project.create(projectOne)
-            }).then(result => {
+                };
+                return Project.create(projectOne);
+            })
+            .then(result => {
                 const projectTwo = {
-                    name: 'mySecondProject',
+                    name: "mySecondProject",
                     id: 2
-                }
-                return Project.create(projectTwo)
-            }).then(result => {
+                };
+                return Project.create(projectTwo);
+            })
+            .then(result => {
                 const teamOne = {
-                    name: 'The A Team',
+                    name: "The A Team",
                     projectId: 1,
                     id: 1
-                }
-                return Team.create(teamOne)
-            })
-    })
+                };
+                return Team.create(teamOne);
+            });
+    });
 
-    describe('GET request on /api/projects/:id', () => {
-        it('should return teams', () => {
-            return chai.request(app).get('/api/projects/1')
-                .then(res => {
-                    const project = res.body
-                    expect(project).to.be.an('object')
-                    expect(project.name).to.eql('myFirstProject')
-                    expect(project.teams).to.be.an('array')
-                    expect(project.teams.length).to.eql(1)
-                })
-        })
-    })
+    describe("GET request on /api/projects/:id", () => {
+        it("should return teams", () => {
+            return chai.request(app).get("/api/projects/1").then(res => {
+                const project = res.body;
+                expect(project).to.be.an("object");
+                expect(project.name).to.eql("myFirstProject");
+                expect(project.teams).to.be.an("array");
+                expect(project.teams.length).to.eql(1);
+            });
+        });
+    });
 
-    describe('POST request on /api/projects/:projectId/teams', () => {
-        it('should create a new team', () => {
+    describe("POST request on /api/projects/:projectId/teams", () => {
+        it("should create a new team", () => {
             const obj = {
-                name: 'The B Team'
-            }
-            return chai.request(app)
-                .post('/api/projects/1/teams').send(obj)
+                name: "The B Team"
+            };
+            return chai
+                .request(app)
+                .post("/api/projects/1/teams")
+                .send(obj)
                 .then(res => {
-                    const team = res.body
-                    expect(team).to.be.an('object')
-                    expect(team.name).to.eql('The B Team')
+                    const team = res.body;
+                    expect(team).to.be.an("object");
+                    expect(team.name).to.eql("The B Team");
                     return Team.findById(team.id).then(retrievedTeam => {
-                        expect(retrievedTeam.name).to.be.eql('The B Team')
-                    })
-                })
-        })
-    })
+                        expect(retrievedTeam.name).to.be.eql("The B Team");
+                    });
+                });
+        });
+    });
 
-    describe('PUT request on /api/projects/:projectId/teams/:teamId', () => {
+    describe("PUT request on /api/projects/:projectId/teams/:teamId", () => {
         const obj = {
-            name: 'The Updated A Team'
-        }
-        it('should send a 200 status', () => {
-            return chai.request(app).put('/api/projects/1/teams/1').send(obj)
+            name: "The Updated A Team"
+        };
+        it("should send a 200 status", () => {
+            return chai
+                .request(app)
+                .put("/api/projects/1/teams/1")
+                .send(obj)
                 .then(res => {
-                    expect(res.status).to.be.eql(200)
+                    expect(res.status).to.be.eql(200);
                     return Team.findById(1).then(team => {
-                        expect(team.name).to.be.eql('The Updated A Team')
-                    })
-                })
-        })
-        it('should return a 404 code if team does not exist', () => {
-            return chai.request(app).put('/api/projects/1/teams/9')
+                        expect(team.name).to.be.eql("The Updated A Team");
+                    });
+                });
+        });
+        it("should return a 404 code if team does not exist", () => {
+            return chai
+                .request(app)
+                .put("/api/projects/1/teams/9")
                 .send(obj)
                 .catch(err => {
-                    expect(err.status).to.eql(404)
-                    expect(err.message).to.eql('Not Found')
-                })
-        })
-        it('should return a 404 code if project does not exist', () => {
-            return chai.request(app).put('/api/projects/9/teams/1')
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+        it("should return a 404 code if project does not exist", () => {
+            return chai
+                .request(app)
+                .put("/api/projects/9/teams/1")
                 .send(obj)
                 .catch(err => {
-                    expect(err.status).to.eql(404)
-                    expect(err.message).to.eql('Not Found')
-                })
-        })
-    })
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+    });
 
-    describe('DELETE request on /api/projects/:projectId/teams/:teamId', () => {
-        it('should send a 204 status', () => {
-            return chai.request(app)
-                .delete('/api/projects/1/teams/1')
+    describe("DELETE request on /api/projects/:projectId/teams/:teamId", () => {
+        it("should send a 204 status", () => {
+            return chai
+                .request(app)
+                .delete("/api/projects/1/teams/1")
                 .then(res => {
-                    expect(res.status).to.be.eql(204)
+                    expect(res.status).to.be.eql(204);
                     return Team.findById(1).then(team => {
-                        expect(team).to.be.null
-                    })
-                })
-        })
-        it('should return a 404 code if team does not exist', () => {
-            return chai.request(app).delete('/api/projects/1/teams/9')
+                        expect(team).to.be.null;
+                    });
+                });
+        });
+        it("should return a 404 code if team does not exist", () => {
+            return chai
+                .request(app)
+                .delete("/api/projects/1/teams/9")
                 .catch(err => {
-                    expect(err.status).to.eql(404)
-                    expect(err.message).to.eql('Not Found')
-                })
-        })
-        it('should return a 404 code if project does not exist', () => {
-            return chai.request(app).delete('/api/projects/9/teams/1')
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+        it("should return a 404 code if project does not exist", () => {
+            return chai
+                .request(app)
+                .delete("/api/projects/9/teams/1")
                 .catch(err => {
-                    expect(err.status).to.eql(404)
-                    expect(err.message).to.eql('Not Found')
-                })
-        })
-    })
-})
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+    });
+});

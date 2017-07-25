@@ -1,19 +1,19 @@
-'use strict';
+"use strict";
 
 module.exports = (sequelize, DataTypes) => {
-  const Team = sequelize.define('Team', {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  });
-
-  Team.associate = (models) => {
-    Team.belongsTo(models.Project, {
-      foreignKey: 'projectId',
-      onDelete: 'CASCADE',
+    const Team = sequelize.define("Team", {
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false
+        }
     });
-  };
 
-  return Team;
+    Team.associate = models => {
+        Team.belongsTo(models.Project, {
+            foreignKey: "projectId",
+            onDelete: "CASCADE"
+        });
+    };
+
+    return Team;
 };

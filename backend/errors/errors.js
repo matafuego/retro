@@ -1,7 +1,6 @@
-'use strict';
+"use strict";
 
 module.exports = {
-
     badRequest(name, message) {
         var badRequest = new Error(message);
         badRequest.name = name;
@@ -21,6 +20,5 @@ module.exports = {
         conflict.name = name;
         conflict.statusCode = 409;
         return conflict;
-    },
-
-}
+    }
+};
