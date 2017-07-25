@@ -97,6 +97,7 @@ describe("Team", () => {
                 .request(app)
                 .put("/api/projects/1/teams/9")
                 .send(obj)
+                .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
                     expect(err.message).to.eql("Not Found");
@@ -107,6 +108,7 @@ describe("Team", () => {
                 .request(app)
                 .put("/api/projects/9/teams/1")
                 .send(obj)
+                .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
                     expect(err.message).to.eql("Not Found");
@@ -130,6 +132,7 @@ describe("Team", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/1/teams/9")
+                .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
                     expect(err.message).to.eql("Not Found");
@@ -139,6 +142,7 @@ describe("Team", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/9/teams/1")
+                .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
                     expect(err.message).to.eql("Not Found");

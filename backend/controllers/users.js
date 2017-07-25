@@ -7,7 +7,20 @@ const sequelize = require("../models").sequelize;
 module.exports = {
     create(req, res, next) {
         return User.findOne({
-            where: { username: req.body.username }
+            where: {
+                $or: [
+                    {
+                        username: {
+                            $eq: req.body.username
+                        }
+                    },
+                    {
+                        email: {
+                            $eq: req.body.email
+                        }
+                    }
+                ]
+            }
         })
             .then(user => {
                 if (!user) {

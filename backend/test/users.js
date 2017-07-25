@@ -72,10 +72,14 @@ describe("User", () => {
             });
         });
         it("should return a 404 code", () => {
-            return chai.request(app).get("/api/users/2").catch(err => {
-                expect(err.status).to.eql(404);
-                expect(err.message).to.eql("Not Found");
-            });
+            return chai
+                .request(app)
+                .get("/api/users/2")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
         });
     });
 
@@ -96,6 +100,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .get("/api/users/username/twoUser")
+                .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
                     expect(err.message).to.eql("Not Found");
@@ -125,20 +130,30 @@ describe("User", () => {
             const obj = {
                 username: "oneUser"
             };
-            return chai.request(app).post("/api/users").send(obj).catch(err => {
-                expect(err.status).to.eql(409);
-                expect(err.message).to.eql("Conflict");
-            });
+            return chai
+                .request(app)
+                .post("/api/users")
+                .send(obj)
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(409);
+                    expect(err.message).to.eql("Conflict");
+                });
         });
         it("should fail if email is not unique", () => {
             const obj = {
                 username: "fiveUser",
                 email: "one@mail.com"
             };
-            return chai.request(app).post("/api/users").send(obj).catch(err => {
-                expect(err.status).to.eql(409);
-                expect(err.message).to.eql("Conflict");
-            });
+            return chai
+                .request(app)
+                .post("/api/users")
+                .send(obj)
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(409);
+                    expect(err.message).to.eql("Conflict");
+                });
         });
     });
 
@@ -152,10 +167,14 @@ describe("User", () => {
             });
         });
         it("should return a 404 code", () => {
-            return chai.request(app).delete("/api/users/2").catch(err => {
-                expect(err.status).to.eql(404);
-                expect(err.message).to.eql("Not Found");
-            });
+            return chai
+                .request(app)
+                .delete("/api/users/2")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
         });
     });
 
@@ -220,6 +239,7 @@ describe("User", () => {
                 .request(app)
                 .put("/api/users/1/projects")
                 .send(obj)
+                .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(400);
                     expect(err.message).to.eql("Bad Request");
@@ -242,6 +262,7 @@ describe("User", () => {
                 .request(app)
                 .put("/api/users/2/projects")
                 .send(obj)
+                .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
                     expect(err.message).to.eql("Not Found");

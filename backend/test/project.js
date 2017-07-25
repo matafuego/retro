@@ -45,10 +45,14 @@ describe("Project", () => {
             });
         });
         it("should return a 404 code", () => {
-            return chai.request(app).get("/api/projects/2").catch(err => {
-                expect(err.status).to.eql(404);
-                expect(err.message).to.eql("Not Found");
-            });
+            return chai
+                .request(app)
+                .get("/api/projects/2")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
         });
     });
 
@@ -97,6 +101,7 @@ describe("Project", () => {
                 .request(app)
                 .put("/api/projects/2")
                 .send(obj)
+                .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
                     expect(err.message).to.eql("Not Found");
@@ -114,10 +119,14 @@ describe("Project", () => {
             });
         });
         it("should return a 404 code", () => {
-            return chai.request(app).delete("/api/projects/2").catch(err => {
-                expect(err.status).to.eql(404);
-                expect(err.message).to.eql("Not Found");
-            });
+            return chai
+                .request(app)
+                .delete("/api/projects/2")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
         });
     });
 });
