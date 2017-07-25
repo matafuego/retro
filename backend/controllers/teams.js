@@ -1,12 +1,22 @@
 const Team = require("../models").Team;
+const Project = require("../models").Project;
 const Errors = require("../errors/errors");
 
 module.exports = {
     create(req, res, next) {
-        return Team.create({
-            name: req.body.name,
-            projectId: req.params.projectId
-        })
+        return Project.findById(req.params.projectId)
+            .then(project => {
+                if (!project) {
+                    throw Errors.notFound(
+                        "projectNotFound",
+                        "Project not found"
+                    );
+                }
+                return Team.create({
+                    name: req.body.name,
+                    projectId: req.params.projectId
+                });
+            })
             .then(team => res.status(201).send(team))
             .catch(error => next(error));
     },

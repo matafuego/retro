@@ -6,17 +6,17 @@ const db = require("../models");
 const mysqlhelper = require("./mysqlhelper");
 
 const Project = db.Project;
-const Team = db.Team;
+const Retrospective = db.Retrospective;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
 
 require("./globalBefore");
 
-describe("Team", () => {
+describe("Retrospective", () => {
     beforeEach(() => {
         return mysqlhelper
-            .truncate(Team, db.sequelize)
+            .truncate(Retrospective, db.sequelize)
             .then(result => {
                 return mysqlhelper.truncate(Project, db.sequelize);
             })
@@ -35,52 +35,57 @@ describe("Team", () => {
                 return Project.create(projectTwo);
             })
             .then(result => {
-                const teamOne = {
-                    name: "The A Team",
+                const retrospectiveOne = {
+                    name: "The Sprint A Retrospective",
+                    date: Date.parse("11/30/2011"),
                     projectId: 1,
                     id: 1
                 };
-                return Team.create(teamOne);
+                return Retrospective.create(retrospectiveOne);
             });
     });
 
-    describe("GET request on /api/projects/:id", () => {
-        it("should return teams", () => {
-            return chai.request(app).get("/api/projects/1").then(res => {
-                const project = res.body;
-                expect(project).to.be.an("object");
-                expect(project.name).to.eql("myFirstProject");
-                expect(project.teams).to.be.an("array");
-                expect(project.teams.length).to.eql(1);
-            });
+    describe("GET request on /api/projects/:projectId/retrospectives", () => {
+        it("should return retrospectives", () => {
+            return chai
+                .request(app)
+                .get("/api/projects/1/retrospectives")
+                .then(res => {
+                    const retros = res.body;
+                    expect(retros).to.be.an("array");
+                    expect(retros.length).to.eql(1);
+                });
         });
     });
 
-    describe("POST request on /api/projects/:projectId/teams", () => {
-        it("should create a new team", () => {
+    describe("POST request on /api/projects/:projectId/retrospectives", () => {
+        it("should create a new retrospective", () => {
             const obj = {
-                name: "The B Team"
+                name: "The Sprint B Retrospective",
+                date: Date.parse("11/30/2011")
             };
             return chai
                 .request(app)
-                .post("/api/projects/1/teams")
+                .post("/api/projects/1/retrospectives")
                 .send(obj)
                 .then(res => {
-                    const team = res.body;
-                    expect(team).to.be.an("object");
-                    expect(team.name).to.eql("The B Team");
-                    return Team.findById(team.id).then(retrievedTeam => {
-                        expect(retrievedTeam.name).to.be.eql("The B Team");
+                    const retrospective = res.body;
+                    expect(retrospective).to.be.an("object");
+                    expect(retrospective.name).to.eql(obj.name);
+                    return Retrospective.findById(
+                        retrospective.id
+                    ).then(retrievedRetrospective => {
+                        expect(retrievedRetrospective.name).to.be.eql(obj.name);
                     });
                 });
         });
-        it("should return a 404 code if team does not exist", () => {
+        it("should return a 404 code if retrospective does not exist", () => {
             const obj = {
-                name: "The B Team"
+                name: "The Sprint B Retrospective"
             };
             return chai
                 .request(app)
-                .post("/api/projects/9/teams")
+                .post("/api/projects/9/retrospectives")
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -90,26 +95,29 @@ describe("Team", () => {
         });
     });
 
-    describe("PUT request on /api/projects/:projectId/teams/:teamId", () => {
+    describe("PUT request on /api/projects/:projectId/retrospectives/:retroId", () => {
         const obj = {
-            name: "The Updated A Team"
+            name: "The Updated A Retrospective",
+            date: Date.parse("11/30/2011")
         };
         it("should send a 200 status", () => {
             return chai
                 .request(app)
-                .put("/api/projects/1/teams/1")
+                .put("/api/projects/1/retrospectives/1")
                 .send(obj)
                 .then(res => {
                     expect(res.status).to.be.eql(200);
-                    return Team.findById(1).then(team => {
-                        expect(team.name).to.be.eql("The Updated A Team");
+                    return Retrospective.findById(1).then(retrospective => {
+                        expect(retrospective.name).to.be.eql(
+                            "The Updated A Retrospective"
+                        );
                     });
                 });
         });
-        it("should return a 404 code if team does not exist", () => {
+        it("should return a 404 code if retrospective does not exist", () => {
             return chai
                 .request(app)
-                .put("/api/projects/1/teams/9")
+                .put("/api/projects/1/retrospectives/9")
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -120,7 +128,7 @@ describe("Team", () => {
         it("should return a 404 code if project does not exist", () => {
             return chai
                 .request(app)
-                .put("/api/projects/9/teams/1")
+                .put("/api/projects/9/retrospectives/1")
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -130,22 +138,22 @@ describe("Team", () => {
         });
     });
 
-    describe("DELETE request on /api/projects/:projectId/teams/:teamId", () => {
+    describe("DELETE request on /api/projects/:projectId/retrospectives/:retroId", () => {
         it("should send a 204 status", () => {
             return chai
                 .request(app)
-                .delete("/api/projects/1/teams/1")
+                .delete("/api/projects/1/retrospectives/1")
                 .then(res => {
                     expect(res.status).to.be.eql(204);
-                    return Team.findById(1).then(team => {
-                        expect(team).to.be.null;
+                    return Retrospective.findById(1).then(retrospective => {
+                        expect(retrospective).to.be.null;
                     });
                 });
         });
-        it("should return a 404 code if team does not exist", () => {
+        it("should return a 404 code if retrospective does not exist", () => {
             return chai
                 .request(app)
-                .delete("/api/projects/1/teams/9")
+                .delete("/api/projects/1/retrospectives/9")
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -155,7 +163,7 @@ describe("Team", () => {
         it("should return a 404 code if project does not exist", () => {
             return chai
                 .request(app)
-                .delete("/api/projects/9/teams/1")
+                .delete("/api/projects/9/retrospectives/1")
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);

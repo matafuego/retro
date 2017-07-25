@@ -1,6 +1,6 @@
 # Generating models
 
-$ sequelize model:create --name Example1 --attributes title:string
+$ sequelize model:create --name Retrospective --attributes title:string
 
 $ sequelize model:create --name Example2 --attributes content:string,complete:boolean
 

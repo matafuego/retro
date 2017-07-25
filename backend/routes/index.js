@@ -1,6 +1,8 @@
 const projectsController = require("../controllers").projects;
 const teamsController = require("../controllers").teams;
 const usersController = require("../controllers").users;
+const retroController = require("../controllers").retrospectives;
+const questionController = require("../controllers").questions;
 
 module.exports = app => {
     app.get("/api", (req, res) =>
@@ -45,4 +47,28 @@ module.exports = app => {
             message: "Method not allowed"
         })
     );
+
+    app.get("/api/projects/:projectId/retrospectives", retroController.list);
+    app.post("/api/projects/:projectId/retrospectives", retroController.create);
+    app.put(
+        "/api/projects/:projectId/retrospectives/:retroId",
+        retroController.update
+    );
+    app.delete(
+        "/api/projects/:projectId/retrospectives/:retroId",
+        retroController.delete
+    );
+
+    // For any other request method on teams, we're going to return "Method not allowed"
+    app.all("/api/projects/:projectId/retrospectives", (req, res) =>
+        res.status(405).send({
+            message: "Method not allowed"
+        })
+    );
+
+    app.post("/api/questions", questionController.create);
+    app.get("/api/questions", questionController.list);
+    app.get("/api/questions/:questionId", questionController.retrieve);
+    app.put("/api/questions/:questionId", questionController.update);
+    app.delete("/api/questions/:questionId", questionController.delete);
 };
