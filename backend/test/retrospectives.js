@@ -7,6 +7,7 @@ const mysqlhelper = require("./mysqlhelper");
 
 const Project = db.Project;
 const Retrospective = db.Retrospective;
+const Question = db.Question;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -15,10 +16,33 @@ require("./globalBefore");
 
 describe("Retrospective", () => {
     beforeEach(() => {
-        return mysqlhelper
-            .truncate(Retrospective, db.sequelize)
+        return db.sequelize
+            .query("TRUNCATE table Questionnaire")
+            .then(result => {
+                return mysqlhelper.truncate(Retrospective, db.sequelize);
+            })
+            .then(result => {
+                return mysqlhelper.truncate(Question, db.sequelize);
+            })
             .then(result => {
                 return mysqlhelper.truncate(Project, db.sequelize);
+            })
+            .then(result => {
+                const question = {
+                    question:
+                        "What is the meaning of life, the universe, and everything?",
+                    type: "textQuestion",
+                    id: 1
+                };
+                return Question.create(question);
+            })
+            .then(result => {
+                const question = {
+                    question: "How many roads must a man walk down?",
+                    type: "textQuestion",
+                    id: 2
+                };
+                return Question.create(question);
             })
             .then(result => {
                 const projectOne = {
@@ -164,6 +188,97 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/9/retrospectives/1")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+    });
+    describe("PUT request on /api/retrospectives/:retroId/questions/", () => {
+        it("should add a question to a retro", () => {
+            const obj = [
+                {
+                    questionId: 1
+                }
+            ];
+            return chai
+                .request(app)
+                .put("/api/retrospectives/1/questions")
+                .send(obj)
+                .then(res => {
+                    const retro = res.body;
+                    expect(retro).to.be.an("object");
+                    expect(retro.name).to.eql("The Sprint A Retrospective");
+                    return Retrospective.findById(retro.id).then(retrieved => {
+                        expect(retrieved.name).to.be.eql(retro.name);
+                        return retrieved.getQuestions().then(questions => {
+                            expect(questions.length).to.be.eql(1);
+                        });
+                    });
+                });
+        });
+        it("should add more than one question to a retro", () => {
+            const obj = [
+                {
+                    questionId: 1
+                },
+                {
+                    questionId: 2
+                }
+            ];
+            return chai
+                .request(app)
+                .put("/api/retrospectives/1/questions")
+                .send(obj)
+                .then(res => {
+                    const retro = res.body;
+                    expect(retro).to.be.an("object");
+                    expect(retro.name).to.eql("The Sprint A Retrospective");
+                    return Retrospective.findById(retro.id).then(retrieved => {
+                        expect(retrieved.name).to.be.eql(retro.name);
+                        return retrieved.getQuestions().then(questions => {
+                            expect(questions.length).to.be.eql(2);
+                        });
+                    });
+                });
+        });
+        it("should not add any questions if one doesn't exist", () => {
+            const obj = [
+                {
+                    questionId: 1
+                },
+                {
+                    questionId: 9
+                }
+            ];
+            return chai
+                .request(app)
+                .put("/api/retrospectives/1/questions")
+                .send(obj)
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(400);
+                    expect(err.message).to.eql("Bad Request");
+                })
+                .then(res => {
+                    return Retrospective.findById(1).then(retrieved => {
+                        return retrieved.getQuestions().then(questions => {
+                            expect(questions.length).to.be.eql(0);
+                        });
+                    });
+                });
+        });
+        it("should fail if retro does not exist", () => {
+            const obj = [
+                {
+                    questionId: 1
+                }
+            ];
+            return chai
+                .request(app)
+                .put("/api/retrospectives/9/questions")
+                .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);

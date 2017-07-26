@@ -71,4 +71,9 @@ module.exports = app => {
     app.get("/api/questions/:questionId", questionController.retrieve);
     app.put("/api/questions/:questionId", questionController.update);
     app.delete("/api/questions/:questionId", questionController.delete);
+
+    app.put(
+        "/api/retrospectives/:retroId/questions/",
+        retroController.addQuestions
+    );
 };

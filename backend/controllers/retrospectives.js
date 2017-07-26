@@ -1,6 +1,8 @@
 const Retrospective = require("../models").Retrospective;
 const Project = require("../models").Project;
+const Question = require("../models").Question;
 const Errors = require("../errors/errors");
+const sequelize = require("../models").sequelize;
 
 module.exports = {
     list(req, res, next) {
@@ -87,5 +89,76 @@ module.exports = {
                 );
             })
             .catch(error => next(error));
+    },
+    addQuestions(req, res, next) {
+        return sequelize
+            .transaction()
+            .then(function(t) {
+                return Retrospective.findById(req.params.retroId, {
+                    transaction: t
+                })
+                    .then(retro => {
+                        if (!retro) {
+                            throw Errors.notFound(
+                                "retroNotFound",
+                                "Retrospective not found"
+                            );
+                        }
+
+                        var promises = [];
+                        var questions = req.body;
+                        questions.forEach(question =>
+                            promises.push(
+                                addQuestionToRetro(
+                                    retro,
+                                    question.questionId,
+                                    t
+                                )
+                            )
+                        );
+
+                        return sequelize.Promise.all(promises);
+                    })
+                    .then(result => {
+                        return Retrospective.findById(req.params.retroId, {
+                            include: [
+                                {
+                                    model: Question,
+                                    as: "questions"
+                                }
+                            ],
+                            transaction: t
+                        });
+                    })
+                    .then(retro => {
+                        if (!retro) {
+                            throw Errors.notFound(
+                                "retroNotFound",
+                                "Retrospective not found"
+                            );
+                        }
+                        return res.status(200).send(retro);
+                    })
+                    .then(result => {
+                        return t.commit();
+                    })
+                    .catch(error => {
+                        t.rollback();
+                        next(error);
+                    });
+            })
+            .catch(error => next(error));
     }
 };
+
+function addQuestionToRetro(retro, questionId, t) {
+    return Question.findById(questionId, { transaction: t }).then(question => {
+        if (!question) {
+            throw Errors.badRequest(
+                "questionNotFound",
+                "Question " + questionId + " does not exist"
+            );
+        }
+        return retro.addQuestion(question, { transaction: t });
+    });
+}
