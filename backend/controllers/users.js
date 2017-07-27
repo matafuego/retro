@@ -101,6 +101,19 @@ module.exports = {
             .catch(error => next(error));
     },
 
+    removeFromProject(req, res, next) {
+        return User.findById(req.params.userId)
+            .then(user => {
+                if (!user) {
+                    throw Errors.notFound("userNotFound", "User not found");
+                }
+
+                return removeUserFromProject(user, req.params.projectId);
+            })
+            .then(result => res.status(204).send())
+            .catch(error => next(error));
+    },
+
     asignToProject(req, res, next) {
         return sequelize
             .transaction()
@@ -165,5 +178,17 @@ function assignUserToProject(user, projectId, t) {
             );
         }
         return user.addProject(project, { transaction: t });
+    });
+}
+
+function removeUserFromProject(user, projectId) {
+    return Project.findById(projectId).then(project => {
+        if (!project) {
+            throw Errors.badRequest(
+                "projectNotFound",
+                "Project " + projectId + " does not exist"
+            );
+        }
+        return user.removeProject(projectId);
     });
 }

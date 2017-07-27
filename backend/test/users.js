@@ -45,6 +45,18 @@ describe("User", () => {
                     id: 1
                 };
                 return User.create(userOne);
+            })
+            .then(result => {
+                const userTen = {
+                    username: "tenUser",
+                    email: "ten@mail.com",
+                    name: "Ten User Name",
+                    id: 10
+                };
+                return User.create(userTen);
+            })
+            .then(userTen => {
+                return userTen.addProject(1);
             });
     });
 
@@ -262,6 +274,55 @@ describe("User", () => {
                 .request(app)
                 .put("/api/users/2/projects")
                 .send(obj)
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+    });
+
+    describe("DELETE request on /api/users/:userId/projects/:projectId", () => {
+        it("should remove a project from a user", () => {
+            return chai
+                .request(app)
+                .delete("/api/users/10/projects/1")
+                .then(res => {
+                    expect(res.status).to.be.eql(204);
+                    return User.findById(10);
+                })
+                .then(user10 => {
+                    return user10.getProjects();
+                })
+                .then(projects => {
+                    expect(projects.length).to.be.eql(0);
+                })
+                .then(Project.findById(1))
+                .then(project => {
+                    expect(project).to.not.be.null;
+                });
+        });
+        it("should not remove the project if it doesn't exist", () => {
+            return chai
+                .request(app)
+                .delete("/api/users/10/projects/9")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(400);
+                    expect(err.message).to.eql("Bad Request");
+                })
+                .then(res => {
+                    return User.findById(10).then(retrieved => {
+                        return retrieved.getProjects().then(projects => {
+                            expect(projects.length).to.be.eql(1);
+                        });
+                    });
+                });
+        });
+        it("should fail if user does not exist", () => {
+            return chai
+                .request(app)
+                .delete("/api/users/9/projects/1")
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);

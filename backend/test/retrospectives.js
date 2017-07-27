@@ -375,6 +375,7 @@ describe("Retrospective", () => {
                 });
         });
     });
+
     describe("DELETE request on /api/retrospectives/:retroId/questions/:questionId", () => {
         it("should remove a question from a retro", () => {
             return chai

@@ -41,6 +41,11 @@ module.exports = app => {
     app.delete("/api/users/:userId", usersController.delete);
     app.put("/api/users/:userId/projects/", usersController.asignToProject);
 
+    app.delete(
+        "/api/users/:userId/projects/:projectId",
+        usersController.removeFromProject
+    );
+
     // For any other request method on teams, we're going to return "Method not allowed"
     app.all("/api/users", (req, res) =>
         res.status(405).send({
