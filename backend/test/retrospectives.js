@@ -66,6 +66,18 @@ describe("Retrospective", () => {
                     id: 1
                 };
                 return Retrospective.create(retrospectiveOne);
+            })
+            .then(result => {
+                const retrospectiveTen = {
+                    name: "The Sprint K Retrospective",
+                    date: Date.parse("09/30/2012"),
+                    projectId: 1,
+                    id: 10
+                };
+                return Retrospective.create(retrospectiveTen);
+            })
+            .then(retro10 => {
+                return retro10.addQuestion(1);
             });
     });
 
@@ -77,7 +89,7 @@ describe("Retrospective", () => {
                 .then(res => {
                     const retros = res.body;
                     expect(retros).to.be.an("array");
-                    expect(retros.length).to.eql(1);
+                    expect(retros.length).to.eql(2);
                 });
         });
     });
@@ -279,6 +291,131 @@ describe("Retrospective", () => {
                 .request(app)
                 .put("/api/retrospectives/9/questions")
                 .send(obj)
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+    });
+
+    describe("PUT request on /api/projects/:projectId/retrospectives/:retroId", () => {
+        const obj = {
+            name: "The Updated A Retrospective",
+            date: Date.parse("11/30/2011")
+        };
+        it("should send a 200 status", () => {
+            return chai
+                .request(app)
+                .put("/api/projects/1/retrospectives/1")
+                .send(obj)
+                .then(res => {
+                    expect(res.status).to.be.eql(200);
+                    return Retrospective.findById(1).then(retrospective => {
+                        expect(retrospective.name).to.be.eql(
+                            "The Updated A Retrospective"
+                        );
+                    });
+                });
+        });
+        it("should return a 404 code if retrospective does not exist", () => {
+            return chai
+                .request(app)
+                .put("/api/projects/1/retrospectives/9")
+                .send(obj)
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+        it("should return a 404 code if project does not exist", () => {
+            return chai
+                .request(app)
+                .put("/api/projects/9/retrospectives/1")
+                .send(obj)
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+    });
+
+    describe("DELETE request on /api/projects/:projectId/retrospectives/:retroId", () => {
+        it("should send a 204 status", () => {
+            return chai
+                .request(app)
+                .delete("/api/projects/1/retrospectives/1")
+                .then(res => {
+                    expect(res.status).to.be.eql(204);
+                    return Retrospective.findById(1).then(retrospective => {
+                        expect(retrospective).to.be.null;
+                    });
+                });
+        });
+        it("should return a 404 code if retrospective does not exist", () => {
+            return chai
+                .request(app)
+                .delete("/api/projects/1/retrospectives/9")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+        it("should return a 404 code if project does not exist", () => {
+            return chai
+                .request(app)
+                .delete("/api/projects/9/retrospectives/1")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+    });
+    describe("DELETE request on /api/retrospectives/:retroId/questions/:questionId", () => {
+        it("should remove a question from a retro", () => {
+            return chai
+                .request(app)
+                .delete("/api/retrospectives/10/questions/1")
+                .then(res => {
+                    expect(res.status).to.be.eql(204);
+                    return Retrospective.findById(10);
+                })
+                .then(retro10 => {
+                    return retro10.getQuestions();
+                })
+                .then(questions => {
+                    expect(questions.length).to.be.eql(0);
+                })
+                .then(Question.findById(1))
+                .then(question => {
+                    expect(question).to.not.be.null;
+                });
+        });
+        it("should not remove the question if it doesn't exist", () => {
+            return chai
+                .request(app)
+                .delete("/api/retrospectives/10/questions/9")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(400);
+                    expect(err.message).to.eql("Bad Request");
+                })
+                .then(res => {
+                    return Retrospective.findById(10).then(retrieved => {
+                        return retrieved.getQuestions().then(questions => {
+                            expect(questions.length).to.be.eql(1);
+                        });
+                    });
+                });
+        });
+        it("should fail if retro does not exist", () => {
+            return chai
+                .request(app)
+                .delete("/api/retrospectives/9/questions/1")
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);

@@ -76,4 +76,8 @@ module.exports = app => {
         "/api/retrospectives/:retroId/questions/",
         retroController.addQuestions
     );
+    app.delete(
+        "/api/retrospectives/:retroId/questions/:questionId",
+        retroController.removeQuestion
+    );
 };

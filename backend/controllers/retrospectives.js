@@ -90,6 +90,23 @@ module.exports = {
             })
             .catch(error => next(error));
     },
+
+    removeQuestion(req, res, next) {
+        return Retrospective.findById(req.params.retroId)
+            .then(retro => {
+                if (!retro) {
+                    throw Errors.notFound(
+                        "RetrospectiveNotFound",
+                        "Retrospective not found"
+                    );
+                }
+
+                return removeQuestionFromRetro(retro, req.params.questionId);
+            })
+            .then(result => res.status(204).send())
+            .catch(error => next(error));
+    },
+
     addQuestions(req, res, next) {
         return sequelize
             .transaction()
@@ -160,5 +177,17 @@ function addQuestionToRetro(retro, questionId, t) {
             );
         }
         return retro.addQuestion(question, { transaction: t });
+    });
+}
+
+function removeQuestionFromRetro(retro, questionId) {
+    return Question.findById(questionId).then(question => {
+        if (!question) {
+            throw Errors.badRequest(
+                "questionNotFound",
+                "Question " + questionId + " does not exist"
+            );
+        }
+        return retro.removeQuestion(questionId);
     });
 }
