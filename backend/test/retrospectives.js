@@ -402,8 +402,8 @@ describe("Retrospective", () => {
                 .delete("/api/retrospectives/10/questions/9")
                 .then(res => expect.fail())
                 .catch(err => {
-                    expect(err.status).to.eql(400);
-                    expect(err.message).to.eql("Bad Request");
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
                 })
                 .then(res => {
                     return Retrospective.findById(10).then(retrieved => {
@@ -417,6 +417,16 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/retrospectives/9/questions/1")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+        it("should fail if question does not belong to the retro", () => {
+            return chai
+                .request(app)
+                .delete("/api/retrospectives/10/questions/2")
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);

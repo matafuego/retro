@@ -65,8 +65,7 @@ module.exports = {
                     .update({
                         name: req.body.name || project.name
                     })
-                    .then(() => res.status(200).send(project)) // Send back the updated project.
-                    .catch(error => next(error));
+                    .then(() => res.status(200).send(project));
             })
             .catch(error => next(error));
     },
@@ -80,10 +79,7 @@ module.exports = {
                         "Project not found"
                     );
                 }
-                return project
-                    .destroy()
-                    .then(() => res.status(204).send())
-                    .catch(error => next(error));
+                return project.destroy().then(() => res.status(204).send());
             })
             .catch(error => next(error));
     }

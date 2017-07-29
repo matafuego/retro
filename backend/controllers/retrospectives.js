@@ -95,7 +95,14 @@ module.exports = {
     },
 
     removeQuestion(req, res, next) {
-        return Retrospective.findById(req.params.retroId)
+        return Retrospective.findById(req.params.retroId, {
+            include: [
+                {
+                    model: Question,
+                    as: "questions"
+                }
+            ]
+        })
             .then(retro => {
                 if (!retro) {
                     throw Errors.notFound(
@@ -184,13 +191,14 @@ function addQuestionToRetro(retro, questionId, t) {
 }
 
 function removeQuestionFromRetro(retro, questionId) {
-    return Question.findById(questionId).then(question => {
-        if (!question) {
-            throw Errors.badRequest(
-                "questionNotFound",
-                "Question " + questionId + " does not exist"
-            );
+    var found;
+    retro.questions.forEach(question => {
+        if (question.id == questionId) {
+            found = question;
         }
-        return retro.removeQuestion(questionId);
     });
+    if (!found) {
+        throw Errors.notFound("questionNotFound", "Question not found");
+    }
+    return retro.removeQuestion(questionId);
 }
