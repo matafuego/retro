@@ -3,6 +3,7 @@ const teamsController = require("../controllers").teams;
 const usersController = require("../controllers").users;
 const retroController = require("../controllers").retrospectives;
 const questionController = require("../controllers").questions;
+const answerController = require("../controllers").answers;
 
 module.exports = app => {
     app.get("/api", (req, res) =>
@@ -85,4 +86,18 @@ module.exports = app => {
         "/api/retrospectives/:retroId/questions/:questionId",
         retroController.removeQuestion
     );
+
+    app.get(
+        "/api/retrospectives/:retroId/questions/:questionId/answers/",
+        answerController.list
+    );
+
+    app.post(
+        "/api/retrospectives/:retroId/questions/:questionId/answers/",
+        answerController.answerQuestion
+    );
+
+    app.put("/api/answers/:answerId", answerController.update);
+
+    app.delete("/api/answers/:answerId", answerController.delete);
 };

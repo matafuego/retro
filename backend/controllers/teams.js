@@ -22,7 +22,7 @@ module.exports = {
     },
 
     update(req, res, next) {
-        return Team.find({
+        return Team.findOne({
             where: {
                 id: req.params.teamId,
                 projectId: req.params.projectId
@@ -42,7 +42,7 @@ module.exports = {
     },
 
     delete(req, res, next) {
-        return Team.find({
+        return Team.findOne({
             where: {
                 id: req.params.teamId,
                 projectId: req.params.projectId

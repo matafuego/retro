@@ -1,6 +1,7 @@
 const Retrospective = require("../models").Retrospective;
 const Project = require("../models").Project;
 const Question = require("../models").Question;
+
 const Errors = require("../errors/errors");
 const sequelize = require("../models").sequelize;
 
@@ -41,52 +42,54 @@ module.exports = {
                     projectId: req.params.projectId
                 });
             })
-            .then(Retrospective => res.status(201).send(Retrospective))
+            .then(retrospective => res.status(201).send(retrospective))
             .catch(error => next(error));
     },
 
     update(req, res, next) {
-        return Retrospective.find({
+        return Retrospective.findOne({
             where: {
                 id: req.params.retroId,
                 projectId: req.params.projectId
             }
         })
-            .then(Retrospective => {
-                if (!Retrospective) {
+            .then(retrospective => {
+                if (!retrospective) {
                     throw Errors.notFound(
                         "RetrospectiveNotFound",
                         "Retrospective not found"
                     );
                 }
 
-                return Retrospective.update(req.body, {
-                    fields: Object.keys(req.body)
-                }).then(updatedRetrospective =>
-                    res.status(200).send(updatedRetrospective)
-                );
+                return retrospective
+                    .update(req.body, {
+                        fields: Object.keys(req.body)
+                    })
+                    .then(updatedRetrospective =>
+                        res.status(200).send(updatedRetrospective)
+                    );
             })
             .catch(error => next(error));
     },
 
     delete(req, res, next) {
-        return Retrospective.find({
+        return Retrospective.findOne({
             where: {
                 id: req.params.retroId,
                 projectId: req.params.projectId
             }
         })
-            .then(Retrospective => {
-                if (!Retrospective) {
+            .then(retrospective => {
+                if (!retrospective) {
                     throw Errors.notFound(
                         "RetrospectiveNotFound",
                         "Retrospective not found"
                     );
                 }
 
-                return Retrospective.destroy().then(() =>
-                    res.status(204).send()
-                );
+                return retrospective
+                    .destroy()
+                    .then(() => res.status(204).send());
             })
             .catch(error => next(error));
     },
