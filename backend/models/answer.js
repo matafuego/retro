@@ -1,12 +1,23 @@
 "use strict";
 
 module.exports = (sequelize, DataTypes) => {
-    const Answer = sequelize.define("Answer", {
-        answer: {
-            type: DataTypes.TEXT,
-            allowNull: false
+    const Answer = sequelize.define(
+        "Answer",
+        {
+            answer: {
+                type: DataTypes.TEXT,
+                allowNull: false
+            }
+        },
+        {
+            indexes: [
+                {
+                    unique: true,
+                    fields: ["userId", "retroId", "questionId"]
+                }
+            ]
         }
-    });
+    );
 
     Answer.associate = models => {
         Answer.belongsTo(models.User, {

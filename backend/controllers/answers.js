@@ -68,14 +68,30 @@ module.exports = {
     },
 
     answerQuestion(req, res, next) {
-        return Retrospective.findById(req.params.retroId, {
-            include: [
-                {
-                    model: Question,
-                    as: "questions"
-                }
-            ]
+        return Answer.findOne({
+            where: {
+                retroId: req.params.retroId,
+                questionId: req.params.questionId,
+                userId: req.body.userId
+            }
         })
+            .then(answer => {
+                if (answer) {
+                    throw Errors.conflict(
+                        "AnswerExists",
+                        "Answer already exists"
+                    );
+                }
+
+                return Retrospective.findById(req.params.retroId, {
+                    include: [
+                        {
+                            model: Question,
+                            as: "questions"
+                        }
+                    ]
+                });
+            })
             .then(retro => {
                 if (!retro) {
                     throw Errors.notFound(

@@ -169,7 +169,7 @@ describe("Answer", () => {
             };
             return chai
                 .request(app)
-                .post("/api/retrospectives/10/questions/1/answers")
+                .post("/api/retrospectives/10/questions/2/answers")
                 .send(obj)
                 .then(res => {
                     const answer = res.body;
@@ -178,6 +178,21 @@ describe("Answer", () => {
                     return Answer.findById(answer.id).then(retrieved => {
                         expect(retrieved.answer).to.be.eql(obj.answer);
                     });
+                });
+        });
+        it("should return conflict if an answer exists for the same user, question, and retrospective", () => {
+            const obj = {
+                userId: 1,
+                answer: "The number 42"
+            };
+            return chai
+                .request(app)
+                .post("/api/retrospectives/10/questions/1/answers")
+                .send(obj)
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(409);
+                    expect(err.message).to.eql("Conflict");
                 });
         });
         it("should return a 404 code if retrospective does not exist", () => {
