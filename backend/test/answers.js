@@ -108,6 +108,15 @@ describe("Answer", () => {
                 return User.create(userOne);
             })
             .then(result => {
+                const userTwo = {
+                    username: "twoUser",
+                    email: "two@mail.com",
+                    name: "Two User Name",
+                    id: 2
+                };
+                return User.create(userTwo);
+            })
+            .then(result => {
                 const answerOne = {
                     answer: "Forty-Two",
                     retroId: 10,
@@ -115,6 +124,15 @@ describe("Answer", () => {
                     userId: 1
                 };
                 return Answer.create(answerOne);
+            })
+            .then(result => {
+                const answerTwo = {
+                    answer: "Forty and 2",
+                    retroId: 10,
+                    questionId: 1,
+                    userId: 2
+                };
+                return Answer.create(answerTwo);
             });
     });
 
@@ -126,9 +144,32 @@ describe("Answer", () => {
                 .then(res => {
                     const retros = res.body;
                     expect(retros).to.be.an("array");
+                    expect(retros.length).to.eql(2);
+                });
+        });
+        it("should filter by user", () => {
+            return chai
+                .request(app)
+                .get("/api/retrospectives/10/questions/1/answers?users=1")
+                .then(res => {
+                    const retros = res.body;
+                    expect(retros).to.be.an("array");
                     expect(retros.length).to.eql(1);
                 });
         });
+        it("should filter by multiple users", () => {
+            return chai
+                .request(app)
+                .get(
+                    "/api/retrospectives/10/questions/1/answers?users=1&users=2&users=3"
+                )
+                .then(res => {
+                    const retros = res.body;
+                    expect(retros).to.be.an("array");
+                    expect(retros.length).to.eql(2);
+                });
+        });
+
         it("should return a 404 code if retrospective does not exist", () => {
             return chai
                 .request(app)

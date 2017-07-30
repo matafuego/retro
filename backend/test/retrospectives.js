@@ -299,6 +299,29 @@ describe("Retrospective", () => {
         });
     });
 
+    describe("GET request on /api/retrospectives/:retroId/questions/", () => {
+        it("should lists questions in a retro", () => {
+            return chai
+                .request(app)
+                .get("/api/retrospectives/10/questions")
+                .then(res => {
+                    const questions = res.body;
+                    expect(questions).to.be.an("array");
+                    expect(questions.length).to.eql(1);
+                });
+        });
+        it("should fail if retro does not exist", () => {
+            return chai
+                .request(app)
+                .get("/api/retrospectives/9/questions")
+                .then(res => expect.fail())
+                .catch(err => {
+                    expect(err.status).to.eql(404);
+                    expect(err.message).to.eql("Not Found");
+                });
+        });
+    });
+
     describe("PUT request on /api/projects/:projectId/retrospectives/:retroId", () => {
         const obj = {
             name: "The Updated A Retrospective",

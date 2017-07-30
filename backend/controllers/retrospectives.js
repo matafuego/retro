@@ -94,6 +94,28 @@ module.exports = {
             .catch(error => next(error));
     },
 
+    listQuestions(req, res, next) {
+        return Retrospective.findById(req.params.retroId, {
+            include: [
+                {
+                    model: Question,
+                    as: "questions"
+                }
+            ]
+        })
+            .then(retro => {
+                if (!retro) {
+                    throw Errors.notFound(
+                        "RetrospectiveNotFound",
+                        "Retrospective not found"
+                    );
+                }
+
+                return res.status(200).send(retro.questions);
+            })
+            .catch(error => next(error));
+    },
+
     removeQuestion(req, res, next) {
         return Retrospective.findById(req.params.retroId, {
             include: [

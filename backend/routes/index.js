@@ -78,6 +78,11 @@ module.exports = app => {
     app.put("/api/questions/:questionId", questionController.update);
     app.delete("/api/questions/:questionId", questionController.delete);
 
+    app.get(
+        "/api/retrospectives/:retroId/questions/",
+        retroController.listQuestions
+    );
+
     app.put(
         "/api/retrospectives/:retroId/questions/",
         retroController.addQuestions

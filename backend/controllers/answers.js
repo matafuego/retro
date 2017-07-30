@@ -26,11 +26,15 @@ module.exports = {
                 return findQuestionInRetro(retro, req.params.questionId);
             })
             .then(question => {
+                var whereClause = {
+                    retroId: req.params.retroId,
+                    questionId: req.params.questionId
+                };
+                req.query.users
+                    ? (whereClause.userId = req.query.users)
+                    : () => {};
                 return Answer.findAll({
-                    where: {
-                        retroId: req.params.retroId,
-                        questionId: req.params.questionId
-                    }
+                    where: whereClause
                 });
             })
             .then(answers => res.status(200).send(answers))
