@@ -22,15 +22,18 @@ module.exports = (sequelize, DataTypes) => {
     Answer.associate = models => {
         Answer.belongsTo(models.User, {
             foreignKey: "userId",
-            onDelete: "CASCADE"
+            onDelete: "CASCADE",
+            allowNull: false
         });
         Answer.belongsTo(models.Retrospective, {
             foreignKey: "retroId",
-            onDelete: "CASCADE"
+            onDelete: "CASCADE",
+            allowNull: false
         });
         Answer.belongsTo(models.Question, {
             foreignKey: "questionId",
-            onDelete: "CASCADE"
+            onDelete: "CASCADE",
+            allowNull: false
         });
     };
 
