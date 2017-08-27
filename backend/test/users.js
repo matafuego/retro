@@ -4,6 +4,7 @@ const chai = require("chai");
 const app = require("../app");
 const db = require("../models");
 const mysqlhelper = require("./mysqlhelper");
+const constants = require("./constants");
 
 const Project = db.Project;
 const User = db.User;
@@ -64,31 +65,44 @@ describe("User", () => {
 
     describe("GET request on /api/users", () => {
         it("should be json", () => {
-            return chai.request(app).get("/api/users").then(res => {
-                expect(res.type).to.eql("application/json");
-            });
+            return chai
+                .request(app)
+                .get("/api/users")
+                .set("Authorization", constants.token)
+                .then(res => {
+                    expect(res.type).to.eql("application/json");
+                });
         });
         it("should return a 200 status", () => {
-            return chai.request(app).get("/api/users").then(res => {
-                expect(res.status).to.eql(200);
-            });
+            return chai
+                .request(app)
+                .get("/api/users")
+                .set("Authorization", constants.token)
+                .then(res => {
+                    expect(res.status).to.eql(200);
+                });
         });
     });
 
     describe("GET request on /api/users/:userId", () => {
         it("should be a user object", () => {
-            return chai.request(app).get("/api/users/1").then(res => {
-                const user = res.body;
-                expect(user).to.be.an("object");
-                expect(user.username).to.eql("oneUser");
-                expect(user.name).to.eql("One User Name");
-                expect(user.email).to.eql("one@mail.com");
-            });
+            return chai
+                .request(app)
+                .get("/api/users/1")
+                .set("Authorization", constants.token)
+                .then(res => {
+                    const user = res.body;
+                    expect(user).to.be.an("object");
+                    expect(user.username).to.eql("oneUser");
+                    expect(user.name).to.eql("One User Name");
+                    expect(user.email).to.eql("one@mail.com");
+                });
         });
         it("should return a 404 code", () => {
             return chai
                 .request(app)
                 .get("/api/users/2")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -102,6 +116,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .get("/api/users/username/oneUser")
+                .set("Authorization", constants.token)
                 .then(res => {
                     const user = res.body;
                     expect(user).to.be.an("object");
@@ -114,6 +129,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .get("/api/users/username/twoUser")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -130,14 +146,19 @@ describe("User", () => {
                 password: "123123",
                 name: "Two User Name"
             };
-            return chai.request(app).post("/api/users").send(obj).then(res => {
-                expect(res.status).to.eql(201);
-                const user = res.body;
-                expect(user).to.be.an("object");
-                expect(user.username).to.eql("twoUser");
-                expect(user.name).to.eql("Two User Name");
-                expect(user.email).to.eql("two@mail.com");
-            });
+            return chai
+                .request(app)
+                .post("/api/users")
+                .set("Authorization", constants.token)
+                .send(obj)
+                .then(res => {
+                    expect(res.status).to.eql(201);
+                    const user = res.body;
+                    expect(user).to.be.an("object");
+                    expect(user.username).to.eql("twoUser");
+                    expect(user.name).to.eql("Two User Name");
+                    expect(user.email).to.eql("two@mail.com");
+                });
         });
         it("should fail if user is not unique", () => {
             const obj = {
@@ -146,6 +167,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .post("/api/users")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -161,6 +183,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .post("/api/users")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -172,17 +195,22 @@ describe("User", () => {
 
     describe("DELETE request on /api/users/:id", () => {
         it("should send a 204 status", () => {
-            return chai.request(app).delete("/api/users/1").then(res => {
-                expect(res.status).to.be.eql(204);
-                return User.findById(1).then(user => {
-                    expect(user).to.be.null;
+            return chai
+                .request(app)
+                .delete("/api/users/1")
+                .set("Authorization", constants.token)
+                .then(res => {
+                    expect(res.status).to.be.eql(204);
+                    return User.findById(1).then(user => {
+                        expect(user).to.be.null;
+                    });
                 });
-            });
         });
         it("should return a 404 code", () => {
             return chai
                 .request(app)
                 .delete("/api/users/2")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -201,6 +229,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .put("/api/users/1/projects")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     const user = res.body;
@@ -226,6 +255,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .put("/api/users/1/projects")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     const user = res.body;
@@ -251,6 +281,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .put("/api/users/1/projects")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -274,6 +305,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .put("/api/users/2/projects")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -288,6 +320,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .delete("/api/users/10/projects/1")
+                .set("Authorization", constants.token)
                 .then(res => {
                     expect(res.status).to.be.eql(204);
                     return User.findById(10);
@@ -307,6 +340,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .delete("/api/users/10/projects/9")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(400);
@@ -324,6 +358,7 @@ describe("User", () => {
             return chai
                 .request(app)
                 .delete("/api/users/9/projects/1")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);

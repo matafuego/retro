@@ -5,9 +5,12 @@ const app = require("../app");
 const db = require("../models");
 const mysqlhelper = require("./mysqlhelper");
 
+const constants = require("./constants");
+
 const Project = db.Project;
 const Retrospective = db.Retrospective;
 const Question = db.Question;
+const User = db.User;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -26,6 +29,19 @@ describe("Retrospective", () => {
             })
             .then(result => {
                 return mysqlhelper.truncate(Project, db.sequelize);
+            })
+            .then(() => {
+                return mysqlhelper.truncate(User, db.sequelize);
+            })
+            .then(() => {
+                const userOne = {
+                    username: "oneUser",
+                    email: "one@mail.com",
+                    name: "One User Name",
+                    password: "123123",
+                    id: 1
+                };
+                return User.create(userOne);
             })
             .then(result => {
                 const question = {
@@ -86,6 +102,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .get("/api/projects/1/retrospectives")
+                .set("Authorization", constants.token)
                 .then(res => {
                     const retros = res.body;
                     expect(retros).to.be.an("array");
@@ -103,6 +120,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .post("/api/projects/1/retrospectives")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     const retrospective = res.body;
@@ -122,6 +140,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .post("/api/projects/9/retrospectives")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -140,6 +159,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .put("/api/projects/1/retrospectives/1")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     expect(res.status).to.be.eql(200);
@@ -154,6 +174,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .put("/api/projects/1/retrospectives/9")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -165,6 +186,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .put("/api/projects/9/retrospectives/1")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -179,6 +201,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/1/retrospectives/1")
+                .set("Authorization", constants.token)
                 .then(res => {
                     expect(res.status).to.be.eql(204);
                     return Retrospective.findById(1).then(retrospective => {
@@ -190,6 +213,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/1/retrospectives/9")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -200,6 +224,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/9/retrospectives/1")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -217,6 +242,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .put("/api/retrospectives/1/questions")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     const retro = res.body;
@@ -242,6 +268,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .put("/api/retrospectives/1/questions")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     const retro = res.body;
@@ -267,6 +294,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .put("/api/retrospectives/1/questions")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -290,6 +318,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .put("/api/retrospectives/9/questions")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -304,6 +333,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .get("/api/retrospectives/10/questions")
+                .set("Authorization", constants.token)
                 .then(res => {
                     const questions = res.body;
                     expect(questions).to.be.an("array");
@@ -314,6 +344,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .get("/api/retrospectives/9/questions")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -331,6 +362,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .put("/api/projects/1/retrospectives/1")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     expect(res.status).to.be.eql(200);
@@ -345,6 +377,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .put("/api/projects/1/retrospectives/9")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -356,6 +389,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .put("/api/projects/9/retrospectives/1")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -370,6 +404,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/1/retrospectives/1")
+                .set("Authorization", constants.token)
                 .then(res => {
                     expect(res.status).to.be.eql(204);
                     return Retrospective.findById(1).then(retrospective => {
@@ -381,6 +416,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/1/retrospectives/9")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -391,6 +427,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/9/retrospectives/1")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -404,6 +441,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/retrospectives/10/questions/1")
+                .set("Authorization", constants.token)
                 .then(res => {
                     expect(res.status).to.be.eql(204);
                     return Retrospective.findById(10);
@@ -423,6 +461,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/retrospectives/10/questions/9")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -440,6 +479,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/retrospectives/9/questions/1")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -450,6 +490,7 @@ describe("Retrospective", () => {
             return chai
                 .request(app)
                 .delete("/api/retrospectives/10/questions/2")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);

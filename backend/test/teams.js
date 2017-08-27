@@ -4,9 +4,11 @@ const chai = require("chai");
 const app = require("../app");
 const db = require("../models");
 const mysqlhelper = require("./mysqlhelper");
+const constants = require("./constants");
 
 const Project = db.Project;
 const Team = db.Team;
+const User = db.User;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -19,6 +21,19 @@ describe("Team", () => {
             .truncate(Team, db.sequelize)
             .then(result => {
                 return mysqlhelper.truncate(Project, db.sequelize);
+            })
+            .then(() => {
+                return mysqlhelper.truncate(User, db.sequelize);
+            })
+            .then(() => {
+                const userOne = {
+                    username: "oneUser",
+                    email: "one@mail.com",
+                    name: "One User Name",
+                    password: "123123",
+                    id: 1
+                };
+                return User.create(userOne);
             })
             .then(result => {
                 const projectOne = {
@@ -46,13 +61,17 @@ describe("Team", () => {
 
     describe("GET request on /api/projects/:id", () => {
         it("should return teams", () => {
-            return chai.request(app).get("/api/projects/1").then(res => {
-                const project = res.body;
-                expect(project).to.be.an("object");
-                expect(project.name).to.eql("myFirstProject");
-                expect(project.teams).to.be.an("array");
-                expect(project.teams.length).to.eql(1);
-            });
+            return chai
+                .request(app)
+                .get("/api/projects/1")
+                .set("Authorization", constants.token)
+                .then(res => {
+                    const project = res.body;
+                    expect(project).to.be.an("object");
+                    expect(project.name).to.eql("myFirstProject");
+                    expect(project.teams).to.be.an("array");
+                    expect(project.teams.length).to.eql(1);
+                });
         });
     });
 
@@ -64,6 +83,7 @@ describe("Team", () => {
             return chai
                 .request(app)
                 .post("/api/projects/1/teams")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     const team = res.body;
@@ -81,6 +101,7 @@ describe("Team", () => {
             return chai
                 .request(app)
                 .post("/api/projects/9/teams")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -98,6 +119,7 @@ describe("Team", () => {
             return chai
                 .request(app)
                 .put("/api/projects/1/teams/1")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     expect(res.status).to.be.eql(200);
@@ -110,6 +132,7 @@ describe("Team", () => {
             return chai
                 .request(app)
                 .put("/api/projects/1/teams/9")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -121,6 +144,7 @@ describe("Team", () => {
             return chai
                 .request(app)
                 .put("/api/projects/9/teams/1")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -135,6 +159,7 @@ describe("Team", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/1/teams/1")
+                .set("Authorization", constants.token)
                 .then(res => {
                     expect(res.status).to.be.eql(204);
                     return Team.findById(1).then(team => {
@@ -146,6 +171,7 @@ describe("Team", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/1/teams/9")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -156,6 +182,7 @@ describe("Team", () => {
             return chai
                 .request(app)
                 .delete("/api/projects/9/teams/1")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);

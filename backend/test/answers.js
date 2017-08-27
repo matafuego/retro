@@ -4,6 +4,7 @@ const chai = require("chai");
 const app = require("../app");
 const db = require("../models");
 const mysqlhelper = require("./mysqlhelper");
+const constants = require("./constants");
 
 const Project = db.Project;
 const Retrospective = db.Retrospective;
@@ -143,6 +144,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .get("/api/retrospectives/10/questions/1/answers")
+                .set("Authorization", constants.token)
                 .then(res => {
                     const retros = res.body;
                     expect(retros).to.be.an("array");
@@ -153,6 +155,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .get("/api/retrospectives/10/questions/1/answers?users=1")
+                .set("Authorization", constants.token)
                 .then(res => {
                     const retros = res.body;
                     expect(retros).to.be.an("array");
@@ -165,6 +168,7 @@ describe("Answer", () => {
                 .get(
                     "/api/retrospectives/10/questions/1/answers?users=1&users=2&users=3"
                 )
+                .set("Authorization", constants.token)
                 .then(res => {
                     const retros = res.body;
                     expect(retros).to.be.an("array");
@@ -176,6 +180,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .get("/api/retrospectives/9/questions/1/answers")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -186,6 +191,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .get("/api/retrospectives/10/questions/9/answers")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -196,6 +202,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .get("/api/retrospectives/10/questions/3/answers")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -213,6 +220,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .post("/api/retrospectives/10/questions/2/answers")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     const answer = res.body;
@@ -231,6 +239,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .post("/api/retrospectives/10/questions/1/answers")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -246,6 +255,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .post("/api/retrospectives/9/questions/1/answers")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -261,6 +271,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .post("/api/retrospectives/10/questions/9/answers")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -276,6 +287,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .post("/api/retrospectives/10/questions/3/answers")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -291,6 +303,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .post("/api/retrospectives/10/questions/1/answers")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -308,6 +321,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .put("/api/answers/1")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     expect(res.status).to.be.eql(200);
@@ -320,6 +334,7 @@ describe("Answer", () => {
             return chai
                 .request(app)
                 .put("/api/answers/9")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -331,17 +346,22 @@ describe("Answer", () => {
 
     describe("DELETE request on /api/answers/:answerId", () => {
         it("should send a 204 status", () => {
-            return chai.request(app).delete("/api/answers/1").then(res => {
-                expect(res.status).to.be.eql(204);
-                return Answer.findById(1).then(answer => {
-                    expect(answer).to.be.null;
+            return chai
+                .request(app)
+                .delete("/api/answers/1")
+                .set("Authorization", constants.token)
+                .then(res => {
+                    expect(res.status).to.be.eql(204);
+                    return Answer.findById(1).then(answer => {
+                        expect(answer).to.be.null;
+                    });
                 });
-            });
         });
         it("should return a 404 code if answer does not exist", () => {
             return chai
                 .request(app)
                 .delete("/api/answers/9")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);

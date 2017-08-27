@@ -5,7 +5,10 @@ const app = require("../app");
 const db = require("../models");
 const mysqlhelper = require("./mysqlhelper");
 
+const constants = require("./constants");
+
 const Question = db.Question;
+const User = db.User;
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -14,45 +17,73 @@ require("./globalBefore");
 
 describe("Question", () => {
     beforeEach(() => {
-        return mysqlhelper.truncate(Question, db.sequelize).then(result => {
-            const testObject = {
-                question:
-                    "What is the meaning of life, the universe, and everything?",
-                type: "textQuestion",
-                id: 1
-            };
-            return Question.create(testObject);
-        });
+        return mysqlhelper
+            .truncate(Question, db.sequelize)
+            .then(() => {
+                return mysqlhelper.truncate(User, db.sequelize);
+            })
+            .then(() => {
+                const userOne = {
+                    username: "oneUser",
+                    email: "one@mail.com",
+                    name: "One User Name",
+                    password: "123123",
+                    id: 1
+                };
+                return User.create(userOne);
+            })
+            .then(result => {
+                const testObject = {
+                    question:
+                        "What is the meaning of life, the universe, and everything?",
+                    type: "textQuestion",
+                    id: 1
+                };
+                return Question.create(testObject);
+            });
     });
 
     describe("GET request on /api/questions", () => {
         it("should be json", () => {
-            return chai.request(app).get("/api/questions").then(res => {
-                expect(res.type).to.eql("application/json");
-            });
+            return chai
+                .request(app)
+                .get("/api/questions")
+                .set("Authorization", constants.token)
+                .then(res => {
+                    expect(res.type).to.eql("application/json");
+                });
         });
         it("should return a 200 status", () => {
-            return chai.request(app).get("/api/questions").then(res => {
-                expect(res.status).to.eql(200);
-            });
+            return chai
+                .request(app)
+                .get("/api/questions")
+                .set("Authorization", constants.token)
+                .then(res => {
+                    expect(res.status).to.eql(200);
+                });
         });
     });
 
     describe("GET request on /api/questions/:id", () => {
         it("should be a question object", () => {
-            return chai.request(app).get("/api/questions/1").then(res => {
-                const question = res.body;
-                expect(question).to.be.an("object");
-                expect(question.question).to.eql(
-                    "What is the meaning of life, the universe, and everything?"
-                );
-                expect(question.type).to.eql("textQuestion");
-            });
+            return chai
+                .request(app)
+                .get("/api/questions/1")
+                .set("Authorization", constants.token)
+                .then(res => {
+                    const question = res.body;
+                    expect(question).to.be.an("object");
+                    expect(question.question).to.eql(
+                        "What is the meaning of life, the universe, and everything?"
+                    );
+                    expect(question.type).to.eql("textQuestion");
+                });
         });
         it("should return a 404 code", () => {
             return chai
                 .request(app)
                 .get("/api/questions/2")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);
@@ -70,6 +101,7 @@ describe("Question", () => {
             return chai
                 .request(app)
                 .post("/api/questions")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     const question = res.body;
@@ -95,6 +127,7 @@ describe("Question", () => {
             return chai
                 .request(app)
                 .put("/api/questions/1")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => {
                     expect(res.status).to.be.eql(200);
@@ -110,6 +143,7 @@ describe("Question", () => {
             return chai
                 .request(app)
                 .put("/api/questions/2")
+                .set("Authorization", constants.token)
                 .send(obj)
                 .then(res => expect.fail())
                 .catch(err => {
@@ -121,17 +155,22 @@ describe("Question", () => {
 
     describe("DELETE request on /api/questions/:id", () => {
         it("should send a 204 status", () => {
-            return chai.request(app).delete("/api/questions/1").then(res => {
-                expect(res.status).to.be.eql(204);
-                return Question.findById(1).then(question => {
-                    expect(question).to.be.null;
+            return chai
+                .request(app)
+                .delete("/api/questions/1")
+                .set("Authorization", constants.token)
+                .then(res => {
+                    expect(res.status).to.be.eql(204);
+                    return Question.findById(1).then(question => {
+                        expect(question).to.be.null;
+                    });
                 });
-            });
         });
         it("should return a 404 code", () => {
             return chai
                 .request(app)
                 .delete("/api/questions/2")
+                .set("Authorization", constants.token)
                 .then(res => expect.fail())
                 .catch(err => {
                     expect(err.status).to.eql(404);

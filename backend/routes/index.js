@@ -16,97 +16,146 @@ module.exports = app => {
 
     app.post("/login", usersController.login);
 
-    app.post("/api/projects", projectsController.create);
-    app.get("/api/projects", projectsController.list);
-    app.get("/api/projects/:projectId", projectsController.retrieve);
-    app.put("/api/projects/:projectId", projectsController.update);
-    app.delete("/api/projects/:projectId", projectsController.delete);
+    app.post("/api/projects", auth.authenticate(), projectsController.create);
+    app.get("/api/projects", auth.authenticate(), projectsController.list);
+    app.get(
+        "/api/projects/:projectId",
+        auth.authenticate(),
+        projectsController.retrieve
+    );
+    app.put(
+        "/api/projects/:projectId",
+        auth.authenticate(),
+        projectsController.update
+    );
+    app.delete(
+        "/api/projects/:projectId",
+        auth.authenticate(),
+        projectsController.delete
+    );
 
-    app.post("/api/projects/:projectId/teams", teamsController.create);
-    app.put("/api/projects/:projectId/teams/:teamId", teamsController.update);
+    app.post(
+        "/api/projects/:projectId/teams",
+        auth.authenticate(),
+        teamsController.create
+    );
+    app.put(
+        "/api/projects/:projectId/teams/:teamId",
+        auth.authenticate(),
+        teamsController.update
+    );
     app.delete(
         "/api/projects/:projectId/teams/:teamId",
+        auth.authenticate(),
         teamsController.delete
     );
 
-    // For any other request method on teams, we're going to return "Method not allowed"
-    app.all("/api/projects/:projectId/teams", (req, res) =>
-        res.status(405).send({
-            message: "Method not allowed"
-        })
+    app.post("/api/users", auth.authenticate(), usersController.create);
+    app.get("/api/users", auth.authenticate(), usersController.list);
+    app.get(
+        "/api/users/:userId",
+        auth.authenticate(),
+        usersController.retrieve
     );
-
-    app.post("/api/users", usersController.create);
-    app.get("/api/users", usersController.list);
-    app.get("/api/users/:userId", usersController.retrieve);
     app.get(
         "/api/users/username/:username",
+        auth.authenticate(),
         usersController.retrieveByUsername
     );
-    app.delete("/api/users/:userId", usersController.delete);
-    app.put("/api/users/:userId/projects/", usersController.asignToProject);
+    app.delete(
+        "/api/users/:userId",
+        auth.authenticate(),
+        usersController.delete
+    );
+    app.put(
+        "/api/users/:userId/projects/",
+        auth.authenticate(),
+        usersController.asignToProject
+    );
 
     app.delete(
         "/api/users/:userId/projects/:projectId",
+        auth.authenticate(),
         usersController.removeFromProject
     );
 
-    // For any other request method on teams, we're going to return "Method not allowed"
-    app.all("/api/users", (req, res) =>
-        res.status(405).send({
-            message: "Method not allowed"
-        })
+    app.get(
+        "/api/projects/:projectId/retrospectives",
+        auth.authenticate(),
+        retroController.list
     );
-
-    app.get("/api/projects/:projectId/retrospectives", retroController.list);
-    app.post("/api/projects/:projectId/retrospectives", retroController.create);
+    app.post(
+        "/api/projects/:projectId/retrospectives",
+        auth.authenticate(),
+        retroController.create
+    );
     app.put(
         "/api/projects/:projectId/retrospectives/:retroId",
+        auth.authenticate(),
         retroController.update
     );
     app.delete(
         "/api/projects/:projectId/retrospectives/:retroId",
+        auth.authenticate(),
         retroController.delete
     );
 
-    // For any other request method on teams, we're going to return "Method not allowed"
-    app.all("/api/projects/:projectId/retrospectives", (req, res) =>
-        res.status(405).send({
-            message: "Method not allowed"
-        })
+    app.post("/api/questions", auth.authenticate(), questionController.create);
+    app.get("/api/questions", auth.authenticate(), questionController.list);
+    app.get(
+        "/api/questions/:questionId",
+        auth.authenticate(),
+        questionController.retrieve
     );
-
-    app.post("/api/questions", questionController.create);
-    app.get("/api/questions", questionController.list);
-    app.get("/api/questions/:questionId", questionController.retrieve);
-    app.put("/api/questions/:questionId", questionController.update);
-    app.delete("/api/questions/:questionId", questionController.delete);
+    app.put(
+        "/api/questions/:questionId",
+        auth.authenticate(),
+        questionController.update
+    );
+    app.delete(
+        "/api/questions/:questionId",
+        auth.authenticate(),
+        questionController.delete
+    );
 
     app.get(
         "/api/retrospectives/:retroId/questions/",
+        auth.authenticate(),
         retroController.listQuestions
     );
 
     app.put(
         "/api/retrospectives/:retroId/questions/",
+        auth.authenticate(),
         retroController.addQuestions
     );
     app.delete(
         "/api/retrospectives/:retroId/questions/:questionId",
+        auth.authenticate(),
         retroController.removeQuestion
     );
 
     app.get(
         "/api/retrospectives/:retroId/questions/:questionId/answers/",
+        auth.authenticate(),
         answerController.list
     );
 
     app.post(
         "/api/retrospectives/:retroId/questions/:questionId/answers/",
+        auth.authenticate(),
         answerController.answerQuestion
     );
 
-    app.put("/api/answers/:answerId", answerController.update);
+    app.put(
+        "/api/answers/:answerId",
+        auth.authenticate(),
+        answerController.update
+    );
 
-    app.delete("/api/answers/:answerId", answerController.delete);
+    app.delete(
+        "/api/answers/:answerId",
+        auth.authenticate(),
+        answerController.delete
+    );
 };
