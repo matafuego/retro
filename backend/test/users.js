@@ -42,6 +42,7 @@ describe("User", () => {
                     username: "oneUser",
                     email: "one@mail.com",
                     name: "One User Name",
+                    password: "123123",
                     id: 1
                 };
                 return User.create(userOne);
@@ -51,6 +52,7 @@ describe("User", () => {
                     username: "tenUser",
                     email: "ten@mail.com",
                     name: "Ten User Name",
+                    password: "123123",
                     id: 10
                 };
                 return User.create(userTen);
@@ -125,17 +127,16 @@ describe("User", () => {
             const obj = {
                 username: "twoUser",
                 email: "two@mail.com",
+                password: "123123",
                 name: "Two User Name"
             };
             return chai.request(app).post("/api/users").send(obj).then(res => {
+                expect(res.status).to.eql(201);
                 const user = res.body;
                 expect(user).to.be.an("object");
                 expect(user.username).to.eql("twoUser");
                 expect(user.name).to.eql("Two User Name");
                 expect(user.email).to.eql("two@mail.com");
-                return User.findById(user.id).then(retrieved => {
-                    expect(retrieved.username).to.be.eql(user.username);
-                });
             });
         });
         it("should fail if user is not unique", () => {

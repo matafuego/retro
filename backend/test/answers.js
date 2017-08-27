@@ -103,6 +103,7 @@ describe("Answer", () => {
                     username: "oneUser",
                     email: "one@mail.com",
                     name: "One User Name",
+                    password: "123123",
                     id: 1
                 };
                 return User.create(userOne);
@@ -112,6 +113,7 @@ describe("Answer", () => {
                     username: "twoUser",
                     email: "two@mail.com",
                     name: "Two User Name",
+                    password: "123123",
                     id: 2
                 };
                 return User.create(userTwo);

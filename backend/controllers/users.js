@@ -3,8 +3,41 @@ const Project = require("../models").Project;
 const Team = require("../models").Team;
 const Errors = require("../errors/errors");
 const sequelize = require("../models").sequelize;
+const auth = require("../auth").auth;
+const encrypt = require("../auth").encrypt;
 
 module.exports = {
+    login(req, res, next) {
+        return User.findOne({
+            where: { username: req.body.username },
+            include: [
+                {
+                    model: Project,
+                    as: "projects"
+                }
+            ]
+        })
+            .then(user => {
+                if (!user) {
+                    throw Errors.unauthorized("unauthorized");
+                }
+                return encrypt
+                    .validatePassword(user, req.body.password)
+                    .then(areEqual => {
+                        if (areEqual) {
+                            var token = auth.getToken(user);
+                            return res.json({
+                                message: "login successful",
+                                token: token
+                            });
+                        } else {
+                            throw Errors.unauthorized("unauthorized");
+                        }
+                    });
+            })
+            .catch(error => next(error));
+    },
+
     create(req, res, next) {
         return User.findOne({
             where: {
@@ -24,12 +57,24 @@ module.exports = {
         })
             .then(user => {
                 if (!user) {
-                    return User.create({
-                        username: req.body.username,
-                        name: req.body.name,
-                        email: req.body.email
-                    })
-                        .then(user => res.status(201).send(user))
+                    return encrypt
+                        .hashPassword(req.body.password)
+                        .catch(error => next(error))
+                        .then(hash =>
+                            User.create({
+                                username: req.body.username,
+                                name: req.body.name,
+                                email: req.body.email,
+                                password: hash
+                            })
+                        )
+                        .then(user =>
+                            res.status(201).send({
+                                username: user.username,
+                                name: user.name,
+                                email: user.email
+                            })
+                        )
                         .catch(error => next(error));
                 }
                 throw Errors.conflict("userExists", "User already exists");

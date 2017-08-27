@@ -5,12 +5,16 @@ const retroController = require("../controllers").retrospectives;
 const questionController = require("../controllers").questions;
 const answerController = require("../controllers").answers;
 
+const auth = require("../auth/").auth;
+
 module.exports = app => {
-    app.get("/api", (req, res) =>
+    app.get("/api", auth.authenticate(), (req, res) =>
         res.status(200).send({
             message: "Welcome to the Retro99 API!"
         })
     );
+
+    app.post("/login", usersController.login);
 
     app.post("/api/projects", projectsController.create);
     app.get("/api/projects", projectsController.list);
